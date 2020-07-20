@@ -17,9 +17,15 @@ import com.example.arrebol.R;
 @SuppressWarnings("all")
 class TranslateLayout extends FrameLayout implements View.OnClickListener {
 
+    //Menu图标点击的回调事件
     private OnMenuClickListener mOnMenuClickListener;
 
+    //search图标点击的回调事件
+    private OnSearchClickListener mOnSearchClickListener;
+
     private ImageView mMenu;
+
+    private ImageView mSearch;
 
     private TextView mTitle;
 
@@ -59,7 +65,9 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
             mTitleTrans = getResources().getDimension(R.dimen.cl_title_trans);
             mMenu = (ImageView) view.findViewById(R.id.cl_menu);
             mTitle = (TextView) view.findViewById(R.id.cl_title);
+            mSearch = (ImageView) view.findViewById(R.id.cl_search);
             mMenu.setOnClickListener(this);
+            mSearch.setOnClickListener(this);
             setMenuAlpha(0);
         }
     }
@@ -101,6 +109,10 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
         this.mOnMenuClickListener = mOnMenuClickListener;
     }
 
+    public void setOnSearchClickListener(OnSearchClickListener mOnSearchClickListener){
+        this.mOnSearchClickListener = mOnSearchClickListener;
+    }
+
     public void setTitle(CharSequence title) {
         mTitle.setText(title);
     }
@@ -109,8 +121,16 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
         mMenu.setImageDrawable(drawable);
     }
 
+    public void setSearchIcon(Drawable drawable){
+        mSearch.setImageDrawable(drawable);
+    }
+
     public void setMenuIcon(int resId) {
         mMenu.setImageResource(resId);
+    }
+
+    public void setSearchIcon(int resId){
+        mSearch.setImageResource(resId);
     }
 
     public void setMenuTitleSize(float size) {
@@ -125,6 +145,10 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
 //        mMenu.setAlpha(fraction);
         mMenu.setScaleX(fraction);
         mMenu.setScaleY(fraction);
+
+        mSearch.setScaleX(fraction);
+        mSearch.setScaleY(fraction);
+
         mTitle.setTranslationX((1 - fraction) * -mTitleTrans);
     }
 
@@ -135,9 +159,19 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
                 mOnMenuClickListener.onMenuClick();
             }
         }
+
+        if(R.id.cl_search == v.getId()){
+            if(mOnSearchClickListener != null){
+                mOnSearchClickListener.onSearchClick();
+            }
+        }
     }
 
     interface OnMenuClickListener {
         void onMenuClick();
+    }
+
+    interface OnSearchClickListener{
+        void onSearchClick();
     }
 }

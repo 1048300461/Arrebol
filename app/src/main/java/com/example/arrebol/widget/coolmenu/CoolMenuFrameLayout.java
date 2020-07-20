@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.UiThread;
@@ -36,7 +37,11 @@ public final class CoolMenuFrameLayout extends FrameLayout {
 
     private float mTitleSize;
 
+    //菜单的drawable资源
     private Drawable mMenuIcon;
+
+    //搜索的drawable资源
+    private Drawable mSearchIcon;
 
 
     private int[] ids = {R.id.view0, R.id.view1, R.id.view2, R.id.view3, R.id.view4};
@@ -49,13 +54,19 @@ public final class CoolMenuFrameLayout extends FrameLayout {
 
     private ObjectAnimator[] mMenuOpenAnimators;
 
+    private ObjectAnimator[] mSearchOpenAnimators;
+
     private PagerAdapter mAdapter;
 
     private MenuObserver mObserver;
 
     private MenuChooser mMenuChooser = new MenuChooser();
 
+    //菜单点击事件的实现
     private TranslateLayout.OnMenuClickListener menuListener = new MenuListener();
+
+    //搜索点击事件的实现
+    private TranslateLayout.OnSearchClickListener searchListener = new SearchListener();
 
     private boolean opening = false;
 
@@ -80,7 +91,8 @@ public final class CoolMenuFrameLayout extends FrameLayout {
                 getResources().getColor(android.R.color.primary_text_light));
         mTitleSize = array.getDimension(R.styleable.CoolMenuFrameLayout_titleSize,
                 getResources().getDimension(R.dimen.cl_title_size));
-        mMenuIcon = array.getDrawable(R.styleable.CoolMenuFrameLayout_titleIcon);
+        mMenuIcon = array.getDrawable(R.styleable.CoolMenuFrameLayout_titleMenuIcon);
+        mSearchIcon = array.getDrawable(R.styleable.CoolMenuFrameLayout_titleSearchIcon);
         array.recycle();
         init();
     }
@@ -94,13 +106,23 @@ public final class CoolMenuFrameLayout extends FrameLayout {
                 TranslateLayout frameLayout = new TranslateLayout(mContext);
                 frameLayout.setId(ids[i]);
                 frameLayout.setTag(i);
+                //设置fragment的点击事件
                 frameLayout.setOnClickListener(mMenuChooser);
+                //设置菜单的点击事件
                 frameLayout.setOnMenuClickListener(menuListener);
+                //设置搜索的点击事件
+                frameLayout.setOnSearchClickListener(searchListener);
                 if(mMenuIcon != null) {
                     frameLayout.setMenuIcon(mMenuIcon);
                 }
+                if(mSearchIcon != null){
+                    frameLayout.setSearchIcon(mSearchIcon);
+                }
+                //设置标题文字的大小
                 frameLayout.setMenuTitleSize(mTitleSize);
+                //设置标题文字颜色
                 frameLayout.setMenuTitleColor(mTitleColor);
+
                 if (i == num - 1) frameLayout.setMenuAlpha(1);
                 LayoutParams layoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
                 frameLayout.setLayoutParams(layoutParams);
@@ -109,6 +131,7 @@ public final class CoolMenuFrameLayout extends FrameLayout {
             mOpenAnimators = new ObjectAnimator[num];
             mChosenAnimators = new ObjectAnimator[num];
             mMenuOpenAnimators = new ObjectAnimator[num];
+            mSearchOpenAnimators = new ObjectAnimator[num];
             initAnim();
         }
     }
@@ -138,6 +161,12 @@ public final class CoolMenuFrameLayout extends FrameLayout {
             animator.setInterpolator(mInterpolator);
             animator.setDuration(300);
             mMenuOpenAnimators[i] = animator;
+
+            PropertyValuesHolder valuesHolderAlpha2 = PropertyValuesHolder.ofFloat("searchAlpha", 1, 0);
+            animator = ObjectAnimator.ofPropertyValuesHolder(child, valuesHolderAlpha2);
+            animator.setInterpolator(mInterpolator);
+            animator.setDuration(300);
+            mSearchOpenAnimators[i] = animator;
         }
     }
 
@@ -193,6 +222,13 @@ public final class CoolMenuFrameLayout extends FrameLayout {
     public void setMenuIcon(@NonNull int resId) {
         for (int i = 0; i < num; i++) {
             ((TranslateLayout) getChildAt(i)).setMenuIcon(resId);
+        }
+    }
+
+    @UiThread
+    public void setSearchIcon(@NonNull int resId) {
+        for (int i = 0; i < num; i++) {
+            ((TranslateLayout) getChildAt(i)).setSearchIcon(resId);
         }
     }
 
@@ -285,4 +321,11 @@ public final class CoolMenuFrameLayout extends FrameLayout {
         }
     }
 
+    private class SearchListener implements TranslateLayout.OnSearchClickListener {
+        @Override
+        public void onSearchClick() {
+            //搜索图标的点击事件处理
+            Toast.makeText(mContext, "search：current is " + chosen, Toast.LENGTH_SHORT).show();
+        }
+    }
 }

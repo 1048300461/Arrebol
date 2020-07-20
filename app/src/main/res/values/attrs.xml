@@ -10,6 +10,7 @@
         </attr>
         <attr name="titleSize" format="dimension"/>
         <attr name="titleColor" format="color"/>
-        <attr name="titleIcon" format="reference"/>
+        <attr name="titleMenuIcon" format="reference"/>
+        <attr name="titleSearchIcon" format="reference"/>
     </declare-styleable>
 </resources>

@@ -5,4 +5,5 @@
     <string name="cartoon">漫画</string>
     <string name="filmtv">影视</string>
     <string name="favorite">收藏</string>
+    <string name="setting">设置</string>
 </resources>
