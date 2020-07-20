@@ -3,9 +3,17 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
-    <color name="cartoonColor">#57c3c2</color>
-    <color name="novelColor">#f1c4cd</color>
-    <color name="filmtvColor">#1772b4</color>
-    <color name="favoriteColor">#EE3F4D</color>
-    <color name="settingColor">#97846c</color>
+    <color name="colorWhite">#FFFFFF</color>
+
+    <color name="settingColor">#9AD3CA</color>
+    <color name="novelColor">#D7EAE4</color>
+    <color name="cartoonColor">#929FD1</color>
+    <color name="filmtvColor">#C3AAD1</color>
+    <color name="favoriteColor">#E7C7D7</color>
+    <color name="splitColor">#bbb5ac</color>
+
+    <color name="top1Color">#f54545</color>
+    <color name="top2Color">#ff8547</color>
+    <color name="top3Color">#ffac38</color>
+    <color name="topOtherColor">#c7d2d4</color>
 </resources>

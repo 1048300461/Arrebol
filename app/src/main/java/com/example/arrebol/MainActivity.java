@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         String[] titles = {getString(R.string.setting),getString(R.string.novel), getString(R.string.cartoon), getString(R.string.filmtv), getString(R.string.favorite)};
         List<String> titleList = Arrays.asList(titles);
         coolMenuFrameLayout.setTitles(titleList);
-        coolMenuFrameLayout.setMenuIcon(R.drawable.menu2);
+        coolMenuFrameLayout.setMenuIcon(R.drawable.ic_baseline_menu_24);
         coolMenuFrameLayout.setSearchIcon(R.drawable.ic_baseline_search_24);
 
         fragments.add(new SettingFragment());

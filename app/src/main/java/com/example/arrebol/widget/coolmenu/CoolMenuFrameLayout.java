@@ -3,15 +3,18 @@ package com.example.arrebol.widget.coolmenu;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +22,7 @@ import androidx.annotation.UiThread;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.example.arrebol.R;
+import com.example.arrebol.activity.SearchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,7 +130,13 @@ public final class CoolMenuFrameLayout extends FrameLayout {
                 if (i == num - 1) frameLayout.setMenuAlpha(1);
                 LayoutParams layoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
                 frameLayout.setLayoutParams(layoutParams);
+
+                if(i == 0 || i == 4){
+                    ImageView imageView = frameLayout.findViewById(R.id.cl_search);
+                    imageView.setVisibility(GONE);
+                }
                 addView(frameLayout);
+
             }
             mOpenAnimators = new ObjectAnimator[num];
             mChosenAnimators = new ObjectAnimator[num];
@@ -324,8 +334,11 @@ public final class CoolMenuFrameLayout extends FrameLayout {
     private class SearchListener implements TranslateLayout.OnSearchClickListener {
         @Override
         public void onSearchClick() {
-            //搜索图标的点击事件处理
-            Toast.makeText(mContext, "search：current is " + chosen, Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(mContext, SearchActivity.class);
+            intent.putExtra("chosenID", chosen);
+            mContext.startActivity(intent);
+
+            Log.d("zcc", "onSearchClick: " + chosen);
         }
     }
 }
