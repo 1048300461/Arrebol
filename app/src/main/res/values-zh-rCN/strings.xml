@@ -6,4 +6,10 @@
     <string name="filmtv">影视</string>
     <string name="favorite">收藏</string>
     <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+    <string name="search_cartoon_hint">输入漫画名或作者名</string>
+    <string name="search_filmtv_hint">输入影视名</string>
+    <string name="search_novel_hint">输入小说名或作者名</string>
+    <string name="hot_search">热门搜索</string>
+    <string name="history_search">历史搜索</string>
 </resources>

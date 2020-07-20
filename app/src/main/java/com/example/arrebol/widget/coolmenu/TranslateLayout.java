@@ -32,6 +32,7 @@ class TranslateLayout extends FrameLayout implements View.OnClickListener {
     private float mTitleTrans;
     private View view;
 
+
     public TranslateLayout(Context context) {
         super(context);
 
