@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Arrebol</string>
+    <string name="novel">小说</string>
+    <string name="cartoon">漫画</string>
+    <string name="filmtv">影视</string>
+    <string name="favorite">收藏</string>
+    <string name="setting">设置</string>
+</resources>

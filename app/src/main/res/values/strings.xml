@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Arrebol</string>
+    <string name="novel">Novel</string>
+    <string name="cartoon">Cartoon</string>
+    <string name="filmtv">FilmTv</string>
+    <string name="favorite">Favorite</string>
+    <string name="setting">setting</string>
 </resources>

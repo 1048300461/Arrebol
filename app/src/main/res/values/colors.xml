@@ -3,4 +3,9 @@
     <color name="colorPrimary">#6200EE</color>
     <color name="colorPrimaryDark">#3700B3</color>
     <color name="colorAccent">#03DAC5</color>
+    <color name="cartoonColor">#57c3c2</color>
+    <color name="novelColor">#f1c4cd</color>
+    <color name="filmtvColor">#1772b4</color>
+    <color name="favoriteColor">#EE3F4D</color>
+    <color name="settingColor">#97846c</color>
 </resources>
