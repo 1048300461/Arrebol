@@ -2,5 +2,6 @@
 <resources>
     <dimen name="cl_title_trans">40dp</dimen>
     <dimen name="cl_title_size">20sp</dimen>
-    <dimen name="input_size">16sp</dimen>
+    <dimen name="input_text_size">16sp</dimen>
+    <dimen name="history_text_size">14sp</dimen>
 </resources>

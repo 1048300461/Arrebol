@@ -26,11 +26,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/hot_search"
+            android:text="@string/history_search"
             android:textStyle="bold"
-            android:textSize="@dimen/input_size"
-            android:padding="5dp"
-            />
+            android:textSize="@dimen/input_text_size"
+            android:padding="5dp" />
 
         <ImageView
             android:id="@+id/clear_iv"
@@ -41,14 +40,22 @@
             android:layout_alignParentRight="true"
             android:paddingTop="5dp"/>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/history_rcv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/clear_iv"
+            android:layout_marginTop="5dp" />
+
     </RelativeLayout>
 
     <TextView
+        android:id="@+id/top_search_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/history_search"
+        android:text="@string/top_search"
         android:textStyle="bold"
-        android:textSize="@dimen/input_size"
+        android:textSize="@dimen/input_text_size"
         android:padding="5dp"/>
 
     <androidx.recyclerview.widget.RecyclerView

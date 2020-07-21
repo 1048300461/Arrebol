@@ -2,7 +2,6 @@ package com.example.arrebol.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,12 +14,12 @@ import com.example.arrebol.entity.Top;
 
 import java.util.ArrayList;
 
-public class TopAdapter extends RecyclerView.Adapter<TopAdapter.TopViewHolder> {
+public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopViewHolder> {
 
     private ArrayList<Top> topArrayList;
     private Context context;
 
-    public TopAdapter(ArrayList<Top> tops, Context context){
+    public TopSearchAdapter(ArrayList<Top> tops, Context context){
         this.topArrayList = tops;
         this.context = context;
     }
