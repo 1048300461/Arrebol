@@ -12,6 +12,8 @@ import com.example.arrebol.R;
 import com.example.arrebol.entity.History;
 import com.example.arrebol.entity.Top;
 
+import org.litepal.LitePal;
+
 import java.util.ArrayList;
 
 public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdapter.HistoryViewHolder> {
@@ -50,14 +52,32 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
     }
 
     public void addData(History history){
+        for(History history1:histories){
+            if(history1.getName().equals(history.getName())){
+                int index = histories.indexOf(history1);
+
+                if(index != 0){
+                    histories.remove(history1);
+                    histories.add(0, history1);
+                }
+                notifyDataSetChanged();
+                return;
+            }
+        }
         if(histories.size() == 8){
             //删除最后一个元素
             histories.remove(histories.size() - 1);
+
             //添加至第一个元素
             histories.add(0, history);
         }else{
-            histories.add(history);
+            histories.add(0,history);
         }
+        notifyDataSetChanged();
+    }
+
+    public ArrayList<History> getHistories(){
+        return histories;
     }
 
     class HistoryViewHolder extends RecyclerView.ViewHolder{

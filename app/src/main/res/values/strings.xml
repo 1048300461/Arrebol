@@ -11,4 +11,9 @@
     <string name="search_novel_hint">novel name/author</string>
     <string name="top_search">Hot Search</string>
     <string name="history_search">History Search</string>
+    <string name="not_find">Sorry, can\'t find any relative thing</string>
+    <string name="start_reading">Reading</string>
+    <string name="author">Author: </string>
+    <string name="type">Type: </string>
+    <string name="introduce">Introduce: </string>
 </resources>

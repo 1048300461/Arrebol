@@ -11,56 +11,101 @@
 
     <include layout="@layout/search_title"/>
 
+
     <View
         android:layout_height="1px"
         android:layout_width="match_parent"
         android:background="@color/splitColor" />
 
-
-
-    <RelativeLayout
-        android:id="@+id/history_rl"
+    <LinearLayout
+        android:id="@+id/root_result_ly"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/history_search"
-            android:textStyle="bold"
-            android:textSize="@dimen/input_text_size"
-            android:padding="5dp" />
-
-        <ImageView
-            android:id="@+id/clear_iv"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_baseline_delete_outline_24"
-            android:scaleType="fitCenter"
-            android:layout_alignParentRight="true"
-            android:paddingTop="5dp"/>
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/history_rcv"
+        <LinearLayout
+            android:id="@+id/not_find_root_ll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/clear_iv"
-            android:layout_marginTop="5dp" />
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:visibility="gone">
 
-    </RelativeLayout>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/notfind"
+                android:padding="5dp"/>
 
-    <TextView
-        android:id="@+id/top_search_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/top_search"
-        android:textStyle="bold"
-        android:textSize="@dimen/input_text_size"
-        android:padding="5dp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/not_find"
+                android:textSize="@dimen/input_text_size"
+                android:padding="5dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/top_rcv"
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/search_result_rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/root_ly"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/history_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/history_search"
+                android:textStyle="bold"
+                android:textSize="@dimen/input_text_size"
+                android:padding="5dp" />
+
+            <ImageView
+                android:id="@+id/clear_iv"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_baseline_delete_outline_24"
+                android:scaleType="fitCenter"
+                android:layout_alignParentRight="true"
+                android:paddingTop="5dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/history_rcv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/clear_iv"
+                android:layout_marginTop="5dp" />
+
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/top_search_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/top_search"
+            android:textStyle="bold"
+            android:textSize="@dimen/input_text_size"
+            android:padding="5dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/top_rcv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+
 
 </LinearLayout>
