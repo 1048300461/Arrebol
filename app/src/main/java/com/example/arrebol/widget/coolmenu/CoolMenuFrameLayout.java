@@ -334,11 +334,7 @@ public final class CoolMenuFrameLayout extends FrameLayout {
     private class SearchListener implements TranslateLayout.OnSearchClickListener {
         @Override
         public void onSearchClick() {
-            Intent intent = new Intent(mContext, SearchActivity.class);
-            intent.putExtra("chosenID", chosen);
-            mContext.startActivity(intent);
-
-            Log.d("zcc", "onSearchClick: " + chosen);
+            SearchActivity.startActivity(mContext, chosen);
         }
     }
 }

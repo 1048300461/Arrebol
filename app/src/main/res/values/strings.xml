@@ -9,6 +9,6 @@
     <string name="search_cartoon_hint">cartoon name/author</string>
     <string name="search_filmtv_hint">film name</string>
     <string name="search_novel_hint">novel name/author</string>
-    <string name="hot_search">Hot Search</string>
+    <string name="top_search">Hot Search</string>
     <string name="history_search">History Search</string>
 </resources>
