@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp">
+        <ImageView
+            android:id="@+id/cover_iv"
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="180dp"
+            android:layout_weight="2"
+            android:padding="5dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/search_name_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="武动乾坤"
+                android:textSize="@dimen/history_text_size"
+                android:padding="2dp"/>
+
+            <TextView
+                android:id="@+id/search_author_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="作者：天蚕土豆"
+                android:padding="2dp"/>
+
+            <TextView
+                android:id="@+id/search_tag_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="类型：玄幻"
+                android:padding="2dp"/>
+
+            <TextView
+                android:id="@+id/search_introduce_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="简介：浩瀚星辰，万族争锋，灵潮来袭，血战重启。灵山市和平街道花园社区幸福新村的治安形势格外严峻。当街道大妈都不跳广场舞，改练魔法和斗气，楚歌的传说，才刚刚开始。"
+                android:maxLines="3"
+                android:ellipsize="end"
+                android:padding="2dp"/>
+
+            <Button
+                android:id="@+id/search_read_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/start_reading"
+                android:textAllCaps="false"
+                android:background="@drawable/cycle_btn"
+                android:textSize="@dimen/history_text_size"
+                android:textColor="@color/colorWhite"
+                android:layout_margin="5dp"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_height="1px"
+        android:layout_width="match_parent"
+        android:background="@color/splitColor"/>
+</LinearLayout>

@@ -16,4 +16,6 @@
     <color name="top2Color">#ff8547</color>
     <color name="top3Color">#ffac38</color>
     <color name="topOtherColor">#c7d2d4</color>
+
+    <color name="readBtnColor">#68b88e</color>
 </resources>

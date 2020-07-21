@@ -4,7 +4,6 @@ import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
 public class History extends LitePalSupport {
-    @Column(unique = true)
     String name;
 
     public History(){ }
