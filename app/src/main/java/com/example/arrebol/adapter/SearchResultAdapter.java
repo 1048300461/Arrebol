@@ -48,7 +48,10 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         holder.search_introduce.setText(context.getString(R.string.introduce)
                 + searchResultList.get(position).getIntroduce());
 
-        Glide.with(context).load(searchResultList.get(position).getCover()).into(holder.cover_iv);
+        Glide.with(context).load(searchResultList.get(position).getCover())
+                            .placeholder(R.drawable.cover)
+                            .into(holder.cover_iv);
+
     }
 
     @Override

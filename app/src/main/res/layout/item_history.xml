@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:text="斗罗大陆"
         android:gravity="center"
-        android:background="@color/topOtherColor"
+        android:background="@drawable/cycle_grey"
         android:padding="3dp"
         android:layout_margin="5dp"/>
 </LinearLayout>

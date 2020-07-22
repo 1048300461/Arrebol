@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.arrebol.R;
 import com.example.arrebol.adapter.HistorySearchAdapter;
@@ -24,14 +26,23 @@ import com.example.arrebol.adapter.TopSearchAdapter;
 import com.example.arrebol.entity.History;
 import com.example.arrebol.entity.SearchResult;
 import com.example.arrebol.entity.Top;
+import com.example.arrebol.utils.HttpRequestUtils;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+import org.jetbrains.annotations.NotNull;
 import org.litepal.LitePal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 /**
  * 搜索页面
@@ -51,7 +62,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private ArrayList<History> historyArrayList;
 
     //搜索到结果的列表
-    private ArrayList<SearchResult> searchResultArrayList;
+    private ArrayList<SearchResult> searchResultArrayList = new ArrayList<>();
 
     private RelativeLayout history_rl;
 
@@ -74,6 +85,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     //搜索到结果的adapter
     private SearchResultAdapter searchResultAdapter;
+
+    //handler
+    private Handler handler = new Handler();
+
+    //搜索请求的网址
+    private String[] urls = {"http://api.pingcc.cn/", "http://api.pingcc.cn/", "http://api.pingcc.cn/"};
 
     //历史搜索的清除历史搜索
     ImageView clear_iv;
@@ -112,6 +129,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         historySearchAdapter = new HistorySearchAdapter(historyArrayList, this);
         history_rcv.setAdapter(historySearchAdapter);
 
+        search_result_rv.setLayoutManager(new LinearLayoutManager(this));
 
         initListener();
 
@@ -119,32 +137,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * fake data
+     * 加载搜索结果页面
      */
     private void loadSearchResultView() {
-        searchResultArrayList = new ArrayList<>();
-
-        SearchResult searchResult = new SearchResult();
-        searchResult.setName("灵气逼人");
-        searchResult.setCover("https://www.23txt.com/files/article/image/49/49315/49315s.jpg");
-        searchResult.setIntroduce("浩瀚星辰，万族争锋，灵潮来袭，血战重启。灵山市和平街道花园社区幸福新村的治安形势格外严峻。当街道大妈都不跳广场舞，改练魔法和斗气，楚歌的传说，才刚刚开始。");
-        searchResult.setTag("科幻小说");
-        searchResult.setAuthor("卧牛真人");
-
-        searchResultArrayList.add(searchResult);
-
-        SearchResult searchResult2 = new SearchResult();
-        searchResult2.setName("武动乾坤");
-        searchResult2.setCover("http://img.qiqint.la/19/19133/19133s.jpg");
-        searchResult2.setIntroduce("修炼一途，乃窃阴阳，夺造化，转涅盘，握生死，掌轮回。武之极，破苍穹，动乾坤！");
-        searchResult2.setTag("修真小说");
-        searchResult2.setAuthor("天蚕土豆");
-
-        searchResultArrayList.add(searchResult2);
-
-
         //搜索到结果recyclerview设置
-        search_result_rv.setLayoutManager(new LinearLayoutManager(this));
         searchResultAdapter = new SearchResultAdapter(this, searchResultArrayList);
         search_result_rv.setAdapter(searchResultAdapter);
     }
@@ -166,33 +162,17 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         search_v.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
+            public boolean onQueryTextSubmit(String searchInfo) {
                 //隐藏热门搜索和历史搜索的根布局
                 root_ly.setVisibility(View.GONE);
-                //显示搜索结果的根布局
-                root_result_ly.setVisibility(View.VISIBLE);
 
                 //通知修改历史搜索
-                EventBus.getDefault().post(new History(s));
+                EventBus.getDefault().post(new History(searchInfo));
 
-                if(isFind){
-                    //如果找到
-                    //显示搜索结果布局
-                    search_result_rv.setVisibility(View.VISIBLE);
-                    //隐藏未找到布局
-                    not_find_root_ll.setVisibility(View.GONE);
+                //获取数据
+                requestData(searchInfo);
 
-                    //加载搜索到结果的数据布局
-                    loadSearchResultView();
-                }else{
-                    //如果没找到
-                    //隐藏搜索结果布局
-                    search_result_rv.setVisibility(View.GONE);
-                    //显示未找到布局
-                    not_find_root_ll.setVisibility(View.VISIBLE);
-                }
-
-                return false;
+                return true;
             }
 
             @Override
@@ -215,6 +195,107 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 return false;
             }
         });
+
+        //历史搜索的回调事件实现
+        HistorySearchAdapter.TextViewClickListener textViewClickListener = new HistorySearchAdapter.TextViewClickListener() {
+            @Override
+            public void onTvClickListener(String name) {
+                //隐藏热门搜索和历史搜索的根布局
+                root_ly.setVisibility(View.GONE);
+
+                //通知修改历史搜索
+                EventBus.getDefault().post(new History(name));
+
+                //获取数据
+                requestData(name);
+
+                search_v.setQuery(name, false);
+            }
+        };
+        historySearchAdapter.setTextViewClickListener(textViewClickListener);
+    }
+
+    /**
+     * 更新布局
+     */
+    private void updateUI(){
+        //显示搜索结果的根布局
+        root_result_ly.setVisibility(View.VISIBLE);
+
+        if(isFind){
+            //如果找到
+            //显示搜索结果布局
+            search_result_rv.setVisibility(View.VISIBLE);
+            //隐藏未找到布局
+            not_find_root_ll.setVisibility(View.GONE);
+
+            //加载搜索到结果的数据布局
+            loadSearchResultView();
+
+        }else{
+            //如果没找到
+            //隐藏搜索结果布局
+            search_result_rv.setVisibility(View.GONE);
+            //显示未找到布局
+            not_find_root_ll.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
+     * 请求数据
+     */
+    private void requestData(String searchInfo) {
+        //请求参数
+        Map<String, String> params = new HashMap<>();
+        switch (chosenID){
+            case 1://小说
+                params.put("xsname", searchInfo);
+                break;
+            case 2://漫画
+                params.put("mhname", searchInfo);
+                break;
+            case 3://影视
+                params.put("ysname", searchInfo);
+                break;
+            default:
+                break;
+        }
+
+        Call call = HttpRequestUtils.getSearchCall(urls[chosenID-1], params);
+
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                //Toast.makeText(context, "数据请求失败："+ e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                //Toast.makeText(context, response.body().string(), Toast.LENGTH_SHORT).show();
+                //Log.d("ZCC", "onResponse: " + response.body().string());
+                final int status = HttpRequestUtils.parseNovelJson(response.body().string(), searchResultArrayList);
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        handlerNovelResult(status);
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 处理解析后的小说搜索数据
+     */
+    private void handlerNovelResult(int status) {
+        if(status == 1){
+            Toast.makeText(context, context.getString(R.string.not_find), Toast.LENGTH_SHORT).show();
+            isFind = false;
+        }else{
+            isFind = true;
+        }
+        updateUI();
 
     }
 
@@ -287,6 +368,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    /**
+     * 点击事件的处理
+     * @param view
+     */
     @Override
     public void onClick(View view) {
         if(view.getId() == R.id.cancel_tv){
@@ -338,16 +423,18 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     public void updateHistory(History history){
         historySearchAdapter.addData(history);
         history_rl.setVisibility(View.VISIBLE);
-        Log.d("zcc", "updateHistory: " + history.getName());
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //取消注册unregister
         if(EventBus.getDefault().isRegistered(this)){
             EventBus.getDefault().unregister(this);
         }
 
+        //保存数据
         new Thread(new Runnable() {
             @Override
             public void run() {
