@@ -10,9 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.arrebol.R;
 import com.example.arrebol.entity.History;
-import com.example.arrebol.entity.Top;
-
-import org.litepal.LitePal;
 
 import java.util.ArrayList;
 
@@ -22,9 +19,16 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
     private Context context;
     private static final int MAX_LENGTH = 8;
 
+    //文字点击的回调事件
+    private TextViewClickListener textViewClickListener;
+
     public HistorySearchAdapter(ArrayList<History> histories, Context context){
         this.histories = histories;
         this.context = context;
+    }
+
+    public void setTextViewClickListener(TextViewClickListener textViewClickListener) {
+        this.textViewClickListener = textViewClickListener;
     }
 
     @NonNull
@@ -37,8 +41,15 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
     }
 
     @Override
-    public void onBindViewHolder(@NonNull HistoryViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final HistoryViewHolder holder, int position) {
         holder.name_tv.setText(histories.get(position).getName());
+        //点击事件的处理
+        holder.name_tv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                textViewClickListener.onTvClickListener(holder.name_tv.getText().toString());
+            }
+        });
     }
 
     @Override
@@ -86,5 +97,9 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
             super(itemView);
             name_tv = itemView.findViewById(R.id.history_name);
         }
+    }
+
+    public interface TextViewClickListener {
+        void onTvClickListener(String name);
     }
 }
