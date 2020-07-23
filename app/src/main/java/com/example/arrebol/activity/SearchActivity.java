@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -38,6 +37,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -56,7 +56,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private SearchView search_v;
 
     //热门搜索列表
-    private ArrayList<Top> topArrayList;
+    private ArrayList<Top> topArrayList = new ArrayList<>();
 
     //历史搜索列表
     private ArrayList<History> historyArrayList;
@@ -90,7 +90,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     private Handler handler = new Handler();
 
     //搜索请求的网址
-    private String[] urls = {"http://api.pingcc.cn/", "http://api.pingcc.cn/", "http://api.pingcc.cn/"};
+    private String[] apiUrls = {"http://api.pingcc.cn/", "http://api.pingcc.cn/", "http://api.pingcc.cn/"};
 
     //历史搜索的清除历史搜索
     ImageView clear_iv;
@@ -98,7 +98,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     //当前Fragment的ID
     int chosenID;
 
+    private static int result_size;
+
+    //用来判断是否搜索到数据
     private boolean isFind = true;
+
+
 
 
     @Override
@@ -110,25 +115,29 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         context = this;
 
-        //fake data
-        initTopData();
-
         //加载历史搜索数据
         initHistoryData();
 
         //初始化视图
         initView();
 
+        if(chosenID == 2){
+            //初始化热门搜索数据
+            initTopData();
+
+        }
         //热门搜索的recyclerview设置
         top_rcv.setLayoutManager(new LinearLayoutManager(this));
         topSearchAdapter = new TopSearchAdapter(topArrayList, this);
         top_rcv.setAdapter(topSearchAdapter);
+
 
         //历史搜索的recyclerview设置
         history_rcv.setLayoutManager(new GridLayoutManager(this, 2));
         historySearchAdapter = new HistorySearchAdapter(historyArrayList, this);
         history_rcv.setAdapter(historySearchAdapter);
 
+        //搜索结果的recyclerview设置
         search_result_rv.setLayoutManager(new LinearLayoutManager(this));
 
         initListener();
@@ -146,10 +155,11 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * 加载历史数据
+     * 加载历史搜索数据
      */
     private void initHistoryData() {
-        historyArrayList = (ArrayList<History>) LitePal.findAll(History.class);
+        //根据chosenID来来加载不同的历史搜索数据
+        historyArrayList = (ArrayList<History>) LitePal.where("type = ?", chosenID+"").find(History.class);
         Collections.reverse(historyArrayList);
     }
 
@@ -163,31 +173,34 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         search_v.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String searchInfo) {
-                //隐藏热门搜索和历史搜索的根布局
-                root_ly.setVisibility(View.GONE);
-
-                //通知修改历史搜索
-                EventBus.getDefault().post(new History(searchInfo));
-
-                //获取数据
-                requestData(searchInfo);
-
+                searchInfo(searchInfo);
+                search_v.setIconified(true);
+                search_v.setQuery(searchInfo, false);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
+                //更新热门搜索布局的显示与隐藏
+                changeTopViewState();
+
                 if(s.length() == 0){
                     topSearchAdapter.closeFilter(topArrayList);
-                    top_search_tv.setVisibility(View.VISIBLE);
                     if(historySearchAdapter.getItemCount() != 0){
                         history_rl.setVisibility(View.VISIBLE);
+                    }
+                    if(chosenID == 2){
+                        top_search_tv.setVisibility(View.VISIBLE);
                     }
                 }else{
                     topSearchAdapter.setFilter(filter(topArrayList, s));
                     history_rl.setVisibility(View.GONE);
-                    top_search_tv.setVisibility(View.GONE);
+
+                    if(chosenID == 2){
+                        top_search_tv.setVisibility(View.GONE);
+                    }
                 }
+
                 //显示热门搜索和历史搜索的根布局
                 root_ly.setVisibility(View.VISIBLE);
                 //隐藏搜索结果的根布局
@@ -197,28 +210,38 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         });
 
         //历史搜索的回调事件实现
-        HistorySearchAdapter.TextViewClickListener textViewClickListener = new HistorySearchAdapter.TextViewClickListener() {
+        HistorySearchAdapter.onTextViewClickListener onTextViewClickListener = new HistorySearchAdapter.onTextViewClickListener() {
             @Override
             public void onTvClickListener(String name) {
-                //隐藏热门搜索和历史搜索的根布局
-                root_ly.setVisibility(View.GONE);
+                searchInfo(name);
 
-                //通知修改历史搜索
-                EventBus.getDefault().post(new History(name));
-
-                //获取数据
-                requestData(name);
-
+                search_v.setIconified(true);
                 search_v.setQuery(name, false);
             }
         };
-        historySearchAdapter.setTextViewClickListener(textViewClickListener);
+        historySearchAdapter.setOnTextViewClickListener(onTextViewClickListener);
+
+        if(chosenID == 2){
+            //热门搜索点击事件的回调事件
+            TopSearchAdapter.onItemClickListener itemClickListener = new TopSearchAdapter.onItemClickListener() {
+                @Override
+                public void onItemClick(String searchName) {
+                    searchInfo(searchName);
+
+                    search_v.setIconified(true);
+                    search_v.setQuery(searchName, false);
+                }
+            };
+            topSearchAdapter.setOnItemClickListener(itemClickListener);
+        }
     }
+
+
 
     /**
      * 更新布局
      */
-    private void updateUI(){
+    private void updateUIAfterSearch(){
         //显示搜索结果的根布局
         root_result_ly.setVisibility(View.VISIBLE);
 
@@ -239,6 +262,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             //显示未找到布局
             not_find_root_ll.setVisibility(View.VISIBLE);
         }
+
     }
 
     /**
@@ -260,44 +284,38 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             default:
                 break;
         }
-
-        Call call = HttpRequestUtils.getSearchCall(urls[chosenID-1], params);
-
-        call.enqueue(new Callback() {
-            @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                //Toast.makeText(context, "数据请求失败："+ e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                //Toast.makeText(context, response.body().string(), Toast.LENGTH_SHORT).show();
-                //Log.d("ZCC", "onResponse: " + response.body().string());
-                final int status = HttpRequestUtils.parseNovelJson(response.body().string(), searchResultArrayList);
-
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        handlerNovelResult(status);
-                    }
-                });
-            }
-        });
+        HttpRequestUtils.getUrls(apiUrls[chosenID - 1], params);
     }
 
     /**
      * 处理解析后的小说搜索数据
      */
-    private void handlerNovelResult(int status) {
-        if(status == 1){
+    private void handlerNovelResult() {
+        if(searchResultArrayList.size() == 0){
             Toast.makeText(context, context.getString(R.string.not_find), Toast.LENGTH_SHORT).show();
             isFind = false;
+
+            //更新UI
+            updateUIAfterSearch();
         }else{
             isFind = true;
+
+
+            if(searchResultArrayList.size() == result_size){
+                Iterator<SearchResult> iterator = searchResultArrayList.iterator();
+
+                while (iterator.hasNext()){
+                    if(iterator.next().isDisable()){
+                        iterator.remove();
+                    }
+                }
+                updateUIAfterSearch();
+            }
         }
-        updateUI();
 
     }
+
+
 
     /**
      * 初始化视图
@@ -329,18 +347,71 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             history_rl.setVisibility(View.VISIBLE);
         }
 
+        //设置hint内容
         initHintText();
+
+        //设置TopView的显示与隐藏
+        changeTopViewState();
     }
 
     /**
-     * 加载假数据
+     * 根据当前chosenId，改变热门搜索布局的显示与隐藏
+     */
+    private void changeTopViewState(){
+        switch (chosenID){
+            case 1://小说
+            case 3://影视
+                top_rcv.setVisibility(View.GONE);
+                top_search_tv.setVisibility(View.GONE);
+                break;
+            case 2://漫画
+                top_rcv.setVisibility(View.VISIBLE);
+                top_search_tv.setVisibility(View.VISIBLE);
+
+                break;
+        }
+    }
+
+    /**
+     * 在漫画页面中加载热门搜索数据
      */
     private void initTopData(){
-        topArrayList = new ArrayList<>();
-
-        for(int i = 0; i < 5; i++){
-            topArrayList.add(new Top((i+1)+"", "斗罗大陆"+i));
+        if(topArrayList == null){
+            topArrayList = new ArrayList<>();
+        }else{
+            topArrayList.clear();
         }
+        Map<String, String> params = new HashMap<>();
+        params.put("mhlb", "hot");
+        Call call = HttpRequestUtils.getCall(apiUrls[chosenID - 1], params);
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        //数据请求失败
+                        Toast.makeText(context, context.getString(R.string.server_error), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                final int status = HttpRequestUtils.parseHotCartoonJson(response.body().string(), topArrayList);
+
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(status == 1){
+                            Toast.makeText(context, context.getString(R.string.not_find), Toast.LENGTH_SHORT).show();
+                        }else{
+                            topSearchAdapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+        });
 
     }
 
@@ -355,6 +426,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         //字体、提示字体大小
         textView.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                 getResources().getDimension(R.dimen.input_text_size));
+
         switch (chosenID){
             case 1://小说
                 search_v.setQueryHint(getString(R.string.search_novel_hint));
@@ -416,15 +488,90 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     /**
-     * 接受消息
+     * searchview搜索小说,漫画，影视
+     * @param searchInfo
+     */
+    private void searchInfo(String searchInfo){
+        //隐藏热门搜索和历史搜索的根布局
+        root_ly.setVisibility(View.GONE);
+
+        //通知修改历史搜索
+        EventBus.getDefault().post(new History(searchInfo, chosenID));
+
+        //获取数据
+        requestData(searchInfo);
+    }
+
+    /**
+     * 接受更新历史搜索内容的消息
      * @param history
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void updateHistory(History history){
         historySearchAdapter.addData(history);
         history_rl.setVisibility(View.VISIBLE);
+    }
+
+    /**
+     * 接受更新历史搜索内容的消息
+     * @param urls
+     */
+    @Subscribe(threadMode = ThreadMode.BACKGROUND)
+    public void receiveUrls(ArrayList<String> urls){
+        //清空数据
+        searchResultArrayList.clear();
+        //Log.d("rainm", "receiveUrls: " + urls.size() + " " + searchResultArrayList.size());
+        result_size = urls.size();
+
+        if(urls.size() == 0){
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    handlerNovelResult();
+                }
+            });
+
+            return;
+        }
+
+        for(final String detailUrl:urls){
+            Map<String, String> params = new HashMap<>();
+            if(chosenID == 1) params.put("xsurl1", detailUrl);
+            if(chosenID == 2) params.put("mhurl1", detailUrl);
+            if(chosenID == 3) params.put("ysurl", detailUrl);
+
+            Call call = HttpRequestUtils.getCall(apiUrls[chosenID - 1], params);
+
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //数据请求失败
+                            Toast.makeText(context, context.getString(R.string.server_error), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    //解析详细的数据
+                    HttpRequestUtils.parseSearchUrlsJson(response.body().string(), detailUrl, searchResultArrayList);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            //处理数据
+                            handlerNovelResult();
+                        }
+                    });
+                }
+            });
+        }
 
     }
+
+
 
     @Override
     protected void onDestroy() {

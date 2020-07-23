@@ -16,4 +16,5 @@
     <string name="author">Author: </string>
     <string name="type">Type: </string>
     <string name="introduce">Introduce: </string>
+    <string name="server_error">Server error, data request failed</string>
 </resources>
