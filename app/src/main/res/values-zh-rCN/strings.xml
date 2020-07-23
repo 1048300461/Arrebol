@@ -18,4 +18,7 @@
     <string name="type">类型：</string>
     <string name="introduce">简介：</string>
     <string name="server_error">服务器异常，数据请求失败</string>
+    <string name="catalog">目录</string>
+    <string name="detail">详情</string>
+    <string name="reverse">倒序</string>
 </resources>

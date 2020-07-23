@@ -73,20 +73,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="5dp"
-                android:background="@drawable/cycle_green"
-                android:text="@string/start_reading"
+                android:background="@drawable/cycle_novel_color"
+                android:text="@string/detail"
                 android:textAllCaps="false"
                 android:textColor="@color/colorWhite"
                 android:textSize="@dimen/history_text_size"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent" />
 
+            <Button
+                android:id="@+id/favorite_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/cycle_novel_color"
+                android:text="@string/favorite"
+                android:textAllCaps="false"
+                android:textColor="@color/colorWhite"
+                android:textSize="@dimen/history_text_size"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/search_read_btn" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <View
-        android:layout_height="1px"
+        android:id="@+id/split_v"
         android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_below="@id/chapter_name_tv"
         android:background="@color/splitColor"/>
 </LinearLayout>

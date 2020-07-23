@@ -3,6 +3,7 @@ package com.example.arrebol.utils;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.entity.SearchResult;
 import com.example.arrebol.entity.Top;
 
@@ -47,7 +48,7 @@ public class HttpRequestUtils {
                 .build();
 
         //返回一个Call对象
-        Log.d("zcc", "getSearchCall: " + concatUrl);
+        //Log.d("zcc", "getSearchCall: " + concatUrl);
 
         return okHttpClient.newCall(request);
     }
@@ -85,7 +86,7 @@ public class HttpRequestUtils {
                             if(jsonObject.optString("url", "").length() != 0){
                                 //添加到urls
                                 urls.add(jsonObject.optString("url", ""));
-                                Log.d("rainm", jsonObject.optString("url", ""));
+                                //Log.d("rainm", jsonObject.optString("url", ""));
                             }
                         }
                         EventBus.getDefault().post(urls);
@@ -220,15 +221,63 @@ public class HttpRequestUtils {
                 result.setTime(dataObject.optString("time", "unknown"));
                 result.setUrl(url);
 
-                Log.d("rainm", result.getUrl() + "\n"
-                        + result.getName() + "\n"
-                        + result.getTag() + "\n"
-                        + result.getAuthor()+ "\n"
-                        + result.getIntroduce() + "\n"
-                        + result.getCover() + "\n"
-                        + result.getTime() + "\n");
+//                Log.d("rainm", result.getUrl() + "\n"
+//                        + result.getName() + "\n"
+//                        + result.getTag() + "\n"
+//                        + result.getAuthor()+ "\n"
+//                        + result.getIntroduce() + "\n"
+//                        + result.getCover() + "\n"
+//                        + result.getTime() + "\n");
 
                 searchResults.add(result);
+            }
+
+            //Log.d("rainm", "parseCartoonJson: " + searchResults.size());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //Log.d("zcc", "error:" + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * 解析小说和漫画的详细数据
+     * @param content
+     * @param chapters
+     * @return
+     */
+    public static int parseDetailUrlsJson(String content, ArrayList<Chapter> chapters){
+        Log.d("zcc", "parseDetailUrlsJson: " + content);
+        JSONObject object;
+        try {
+            object = new JSONObject(content);
+            //服务器状态
+            int code = object.optInt("code", -1);
+            //查询结果
+            String message = object.optString("message", "");
+
+            SearchResult result;
+            //Log.d("zcc", "parseNovelJson: " + code + " " + message);
+            if(code == 1){
+                //服务器错误
+                return 1;
+            }
+            if(!message.contains("成功")){
+                //未找到内容
+                return 2;
+            }
+            JSONArray jsonArray = object.getJSONArray("list");
+
+            Log.d("zcc", jsonArray.length()+"");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // JSON数组里面的具体-JSON对象
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Chapter chapter = new Chapter();
+                chapter.setCurrentChapter(jsonObject.optString("num", "null"));
+                chapter.setUrl(jsonObject.optString("url", "null"));
+                chapters.add(chapter);
+
+
             }
 
             //Log.d("rainm", "parseCartoonJson: " + searchResults.size());

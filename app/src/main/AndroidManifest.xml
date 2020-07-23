@@ -10,12 +10,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".activity.TestActivity">
-
-        </activity>
-
-        <activity android:name=".activity.SearchActivity" android:launchMode="singleTask" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".activity.WatchingFilmActivity"></activity>
+        <activity android:name=".activity.ReadingCartoonActivity" />
+        <activity android:name=".activity.ReadingNovelActivity" />
+        <activity android:name=".activity.ItemDetailActivity" />
+        <activity android:name=".activity.TestActivity" />
+        <activity
+            android:name=".activity.SearchActivity"
+            android:launchMode="singleTask" />
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

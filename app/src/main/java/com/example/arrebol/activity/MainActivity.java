@@ -1,4 +1,4 @@
-package com.example.arrebol;
+package com.example.arrebol.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import android.os.Bundle;
 
+import com.example.arrebol.R;
 import com.example.arrebol.fragment.CartoonFragment;
 import com.example.arrebol.fragment.FavoriteFragment;
 import com.example.arrebol.fragment.FilmTvFragment;

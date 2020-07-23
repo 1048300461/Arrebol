@@ -1,7 +1,9 @@
 package com.example.arrebol.entity;
 
 /**
- * 搜索结果
+ * 搜索结果的实体类
+ * @author zc
+ * @time 2020/07/21
  */
 public class SearchResult {
     private String url;
