@@ -15,7 +15,6 @@ import com.example.arrebol.R;
 import com.example.arrebol.entity.SearchResult;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ResultViewHolder> {
 
@@ -45,8 +44,15 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                 + searchResultList.get(position).getAuthor());
         holder.search_tag.setText(context.getString(R.string.type)
                 + searchResultList.get(position).getTag());
-        holder.search_introduce.setText(context.getString(R.string.introduce)
-                + searchResultList.get(position).getIntroduce());
+        if(!"null".equals(searchResultList.get(position).getIntroduce())){
+            //介绍不为null标记时
+            holder.search_introduce.setText(context.getString(R.string.introduce)
+                    + searchResultList.get(position).getIntroduce());
+            holder.search_introduce.setVisibility(View.VISIBLE);
+        }else{
+            holder.search_introduce.setVisibility(View.INVISIBLE);
+        }
+
 
         Glide.with(context).load(searchResultList.get(position).getCover())
                             .placeholder(R.drawable.cover)

@@ -18,6 +18,7 @@ public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopV
 
     private ArrayList<Top> topArrayList;
     private Context context;
+    private onItemClickListener onItemClickListener;
 
     public TopSearchAdapter(ArrayList<Top> tops, Context context){
         this.topArrayList = tops;
@@ -33,9 +34,13 @@ public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopV
         return new TopViewHolder(v);
     }
 
+    public void setOnItemClickListener(TopSearchAdapter.onItemClickListener onItemClickListener) {
+        this.onItemClickListener = onItemClickListener;
+    }
+
     @SuppressLint("ResourceAsColor")
     @Override
-    public void onBindViewHolder(@NonNull TopViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final TopViewHolder holder, int position) {
         holder.rank_tv.setBackgroundColor(context.getResources().getColor(R.color.topOtherColor));
         if(topArrayList.size() > 3){
             if(position == 0){
@@ -53,6 +58,13 @@ public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopV
         }
         holder.rank_tv.setText(topArrayList.get(position).getRank());
         holder.name_tv.setText(topArrayList.get(position).getName());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onItemClickListener.onItemClick(holder.name_tv.getText().toString());
+            }
+        });
     }
 
     @Override
@@ -63,13 +75,14 @@ public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopV
     class TopViewHolder extends RecyclerView.ViewHolder{
 
         TextView rank_tv, name_tv;
+        View itemView;
 
         public TopViewHolder(@NonNull View itemView) {
             super(itemView);
 
             rank_tv = itemView.findViewById(R.id.rank_tv);
             name_tv = itemView.findViewById(R.id.name_tv);
-
+            this.itemView = itemView;
         }
     }
 
@@ -93,5 +106,10 @@ public class TopSearchAdapter extends RecyclerView.Adapter<TopSearchAdapter.TopV
 
         topArrayList.addAll(tops);
         notifyDataSetChanged();
+    }
+
+    //子项目的点击事件
+    public interface onItemClickListener{
+        void onItemClick(String searchName);
     }
 }

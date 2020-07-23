@@ -12,7 +12,7 @@ public class Top {
     //内容名字
     String name;
 
-    //top的状态
+    //top的状态, 当为true时，item显示数字，false不显示数字
     boolean topStatus;
 
     public Top(String rank, String name) {

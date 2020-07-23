@@ -20,15 +20,15 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
     private static final int MAX_LENGTH = 8;
 
     //文字点击的回调事件
-    private TextViewClickListener textViewClickListener;
+    private onTextViewClickListener onTextViewClickListener;
 
     public HistorySearchAdapter(ArrayList<History> histories, Context context){
         this.histories = histories;
         this.context = context;
     }
 
-    public void setTextViewClickListener(TextViewClickListener textViewClickListener) {
-        this.textViewClickListener = textViewClickListener;
+    public void setOnTextViewClickListener(onTextViewClickListener onTextViewClickListener) {
+        this.onTextViewClickListener = onTextViewClickListener;
     }
 
     @NonNull
@@ -47,7 +47,7 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
         holder.name_tv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                textViewClickListener.onTvClickListener(holder.name_tv.getText().toString());
+                onTextViewClickListener.onTvClickListener(holder.name_tv.getText().toString());
             }
         });
     }
@@ -99,7 +99,7 @@ public class HistorySearchAdapter extends RecyclerView.Adapter<HistorySearchAdap
         }
     }
 
-    public interface TextViewClickListener {
+    public interface onTextViewClickListener {
         void onTvClickListener(String name);
     }
 }

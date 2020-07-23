@@ -6,9 +6,14 @@ import org.litepal.crud.LitePalSupport;
 public class History extends LitePalSupport {
     String name;
 
+    //历史的类型 1：小说 2：动漫 3：影视
+    int type;
+
     public History(){ }
-    public History(String name) {
+
+    public History(String name, int type) {
         this.name = name;
+        this.type = type;
     }
 
     public String getName() {
@@ -17,5 +22,13 @@ public class History extends LitePalSupport {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

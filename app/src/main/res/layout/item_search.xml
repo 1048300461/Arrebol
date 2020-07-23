@@ -29,21 +29,27 @@
                 android:layout_height="wrap_content"
                 android:text="武动乾坤"
                 android:textSize="@dimen/history_text_size"
-                android:padding="2dp"/>
+                android:padding="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/search_author_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="作者：天蚕土豆"
-                android:padding="2dp"/>
+                android:padding="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/search_tag_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="类型：玄幻"
-                android:padding="2dp"/>
+                android:padding="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"/>
 
             <TextView
                 android:id="@+id/search_introduce_tv"
