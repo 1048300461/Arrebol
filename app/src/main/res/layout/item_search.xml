@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
     <LinearLayout
@@ -12,66 +12,77 @@
         <ImageView
             android:id="@+id/cover_iv"
             android:layout_width="0dp"
-            android:layout_height="180dp"
+            android:layout_height="190dp"
             android:layout_weight="1"
             android:src="@drawable/cover"/>
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
-            android:layout_height="180dp"
+            android:layout_height="190dp"
             android:layout_weight="2"
-            android:padding="5dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="5dp">
 
             <TextView
                 android:id="@+id/search_name_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:padding="2dp"
                 android:text="武动乾坤"
                 android:textSize="@dimen/history_text_size"
-                android:padding="2dp"
-                android:maxLines="1"
-                android:ellipsize="end"/>
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/search_author_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="作者：天蚕土豆"
-                android:padding="2dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:padding="2dp"
+                android:text="作者：天蚕土豆"
+                app:layout_constraintLeft_toLeftOf="@id/search_name_tv"
+                app:layout_constraintTop_toBottomOf="@id/search_name_tv" />
 
             <TextView
                 android:id="@+id/search_tag_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="类型：玄幻"
-                android:padding="2dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end"/>
+                android:padding="2dp"
+                android:text="类型：玄幻"
+                app:layout_constraintLeft_toLeftOf="@id/search_author_tv"
+                app:layout_constraintTop_toBottomOf="@id/search_author_tv" />
 
             <TextView
                 android:id="@+id/search_introduce_tv"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="简介：浩瀚星辰，万族争锋，灵潮来袭，血战重启。灵山市和平街道花园社区幸福新村的治安形势格外严峻。当街道大妈都不跳广场舞，改练魔法和斗气，楚歌的传说，才刚刚开始。"
-                android:maxLines="3"
                 android:ellipsize="end"
-                android:padding="2dp"/>
+                android:maxLines="3"
+                android:padding="2dp"
+                android:text="简介：浩瀚星辰，万族争锋，灵潮来袭，血战重启。灵山市和平街道花园社区幸福新村的治安形势格外严峻。当街道大妈都不跳广场舞，改练魔法和斗气，楚歌的传说，才刚刚开始。"
+                app:layout_constraintLeft_toLeftOf="@id/search_tag_tv"
+                app:layout_constraintTop_toBottomOf="@id/search_tag_tv" />
 
             <Button
                 android:id="@+id/search_read_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/cycle_green"
                 android:text="@string/start_reading"
                 android:textAllCaps="false"
-                android:background="@drawable/cycle_green"
-                android:textSize="@dimen/history_text_size"
                 android:textColor="@color/colorWhite"
-                android:layout_margin="5dp"
-                />
-        </LinearLayout>
+                android:textSize="@dimen/history_text_size"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 
     <View
