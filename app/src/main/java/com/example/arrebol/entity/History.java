@@ -3,6 +3,11 @@ package com.example.arrebol.entity;
 import org.litepal.annotation.Column;
 import org.litepal.crud.LitePalSupport;
 
+/**
+ * 历史搜索的实体类
+ * @author zc
+ * @time 2020/07/21
+ */
 public class History extends LitePalSupport {
     String name;
 

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
@@ -103,9 +104,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     //用来判断是否搜索到数据
     private boolean isFind = true;
 
-
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +150,17 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         //搜索到结果recyclerview设置
         searchResultAdapter = new SearchResultAdapter(this, searchResultArrayList);
         search_result_rv.setAdapter(searchResultAdapter);
+
+        //搜索结果的回调事件
+        SearchResultAdapter.OnButtonClickListener buttonClickListener = new SearchResultAdapter.OnButtonClickListener() {
+            @Override
+            public void onClick(SearchResult searchResult) {
+                //发送事件
+                EventBus.getDefault().postSticky(searchResult);
+                ItemDetailActivity.startActivity(context, chosenID, searchResult.getUrl());
+            }
+        };
+        searchResultAdapter.setOnButtonClickListener(buttonClickListener);
     }
 
     /**
@@ -234,6 +243,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             };
             topSearchAdapter.setOnItemClickListener(itemClickListener);
         }
+
     }
 
 

@@ -2,8 +2,10 @@ package com.example.arrebol.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -14,6 +16,8 @@ import com.bumptech.glide.Glide;
 import com.example.arrebol.R;
 import com.example.arrebol.entity.SearchResult;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ResultViewHolder> {
@@ -22,9 +26,19 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     private ArrayList<SearchResult> searchResultList;
 
+    private OnButtonClickListener onButtonClickListener;
+
+    public interface OnButtonClickListener{
+        void onClick(SearchResult searchResult);
+    }
+
     public SearchResultAdapter(Context context, ArrayList<SearchResult> searchResults){
         this.context = context;
         this.searchResultList = searchResults;
+    }
+
+    public void setOnButtonClickListener(OnButtonClickListener onButtonClickListener) {
+        this.onButtonClickListener = onButtonClickListener;
     }
 
     @NonNull
@@ -38,7 +52,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     @SuppressLint("SetTextI18n")
     @Override
-    public void onBindViewHolder(@NonNull ResultViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ResultViewHolder holder, final int position) {
         holder.search_name.setText(searchResultList.get(position).getName());
         holder.search_author.setText(context.getString(R.string.author)
                 + searchResultList.get(position).getAuthor());
@@ -58,6 +72,13 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                             .placeholder(R.drawable.cover)
                             .into(holder.cover_iv);
 
+        holder.search_read_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onButtonClickListener.onClick(searchResultList.get(position));
+            }
+        });
+
     }
 
     @Override
@@ -71,6 +92,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                     search_introduce;
         private ImageView cover_iv;
 
+        private Button search_read_btn;
+
         public ResultViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -80,6 +103,8 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
             search_introduce = itemView.findViewById(R.id.search_introduce_tv);
 
             cover_iv = itemView.findViewById(R.id.cover_iv);
+
+            search_read_btn = itemView.findViewById(R.id.search_read_btn);
         }
     }
 }

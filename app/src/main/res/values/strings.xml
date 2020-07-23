@@ -17,4 +17,7 @@
     <string name="type">Type: </string>
     <string name="introduce">Introduce: </string>
     <string name="server_error">Server error, data request failed</string>
+    <string name="catalog">Catalog</string>
+    <string name="detail">Detail</string>
+    <string name="reverse">Reverse</string>
 </resources>
