@@ -22,7 +22,7 @@ public class ReadingCartoonActivity extends AppCompatActivity {
         chosenID = getIntent().getIntExtra("chosenID", 1);
         url = getIntent().getStringExtra("url");
 
-        Log.d("zcc", "onCreate: " + url);
+        Log.d("zcc", "onCreate: " + chosenID + " "+ url);
     }
 
     /**
