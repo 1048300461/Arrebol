@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -185,6 +186,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 searchInfo(searchInfo);
                 search_v.setIconified(true);
                 search_v.setQuery(searchInfo, false);
+
+                //软键盘的显示与隐藏
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
                 return true;
             }
 
