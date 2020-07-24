@@ -126,6 +126,7 @@ public class ItemDetailActivity extends AppCompatActivity {
                 public void onItemClick(String url) {
                     if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, url);
                     if(chosenID == 2) ReadingCartoonActivity.startActivity(context, chosenID, url);
+
                 }
             };
             chapterAdapter.setOnItemClickListener(onItemClickListener);
