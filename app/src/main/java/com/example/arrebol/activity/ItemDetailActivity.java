@@ -66,7 +66,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private Handler handler = new Handler();
 
-    private static String detailUrl;
+    private static String detailUrl, coverUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +77,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         chosenID = getIntent().getIntExtra("chosenID", 1);
         detailUrl = getIntent().getStringExtra("url");
+        coverUrl = getIntent().getStringExtra("cover");
 
         //初始化页面
         initView();
@@ -136,7 +137,13 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         favorite_btn.setVisibility(View.VISIBLE);
         split_v.setVisibility(View.GONE);
-        search_read_btn.setText(context.getResources().getString(R.string.start_reading));
+
+        if(chosenID != 3){
+            search_read_btn.setText(context.getResources().getString(R.string.start_reading));
+        }else{
+            search_read_btn.setText(context.getResources().getString(R.string.start_watching));
+        }
+
 
 
         if(chosenID == 1){
@@ -156,6 +163,10 @@ public class ItemDetailActivity extends AppCompatActivity {
         search_introduce = findViewById(R.id.search_introduce_tv);
 
         cover_iv = findViewById(R.id.cover_iv);
+
+        Glide.with(context).load(coverUrl)
+                .placeholder(R.drawable.cover)
+                .into(cover_iv);
 
     }
 
@@ -193,16 +204,21 @@ public class ItemDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 if(chosenID == 1 || chosenID == 2){
+                    // 当前为小说和漫画的详细内容
                     //Log.d("zcc", "onResponse: " + response.body().toString());
                     HttpRequestUtils.parseDetailUrlsJson(response.body().string(), characters);
-                    handler.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            chapterAdapter.notifyDataSetChanged();
-                            //Log.d("zcc", "run: " + characters.size());
-                        }
-                    });
+
+                }else{
+                    //当前为影视的内容
+                    HttpRequestUtils.parseDetailUrlsJson(response.body().string(), characters);
                 }
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        chapterAdapter.notifyDataSetChanged();
+                        //Log.d("zcc", "run: " + characters.size());
+                    }
+                });
             }
         });
 
@@ -212,10 +228,11 @@ public class ItemDetailActivity extends AppCompatActivity {
     /**
      * 启动活动
      */
-    public static void startActivity(Context context, int chosenID, String detailUrl){
+    public static void startActivity(Context context, int chosenID, String detailUrl, String coverUrl){
         Intent intent = new Intent(context, ItemDetailActivity.class);
         intent.putExtra("chosenID", chosenID);
         intent.putExtra("url", detailUrl);
+        intent.putExtra("cover", coverUrl);
         context.startActivity(intent);
     }
 
@@ -229,10 +246,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         search_tag.setText(context.getString(R.string.type) + searchResult.getTag());
         search_author.setText(context.getString(R.string.author) + searchResult.getAuthor());
         search_introduce.setText(context.getString(R.string.introduce) + searchResult.getIntroduce());
-
-        Glide.with(context).load(searchResult.getCover())
-                .placeholder(R.drawable.cover)
-                .into(cover_iv);
 
     }
 
