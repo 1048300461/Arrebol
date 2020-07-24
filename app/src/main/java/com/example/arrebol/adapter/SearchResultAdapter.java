@@ -28,13 +28,16 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     private OnButtonClickListener onButtonClickListener;
 
+    private int chosenID;
+
     public interface OnButtonClickListener{
         void onClick(SearchResult searchResult);
     }
 
-    public SearchResultAdapter(Context context, ArrayList<SearchResult> searchResults){
+    public SearchResultAdapter(Context context, ArrayList<SearchResult> searchResults, int chosenID){
         this.context = context;
         this.searchResultList = searchResults;
+        this.chosenID = chosenID;
     }
 
     public void setOnButtonClickListener(OnButtonClickListener onButtonClickListener) {
@@ -72,6 +75,13 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
                             .placeholder(R.drawable.cover)
                             .into(holder.cover_iv);
 
+        if(chosenID == 1){
+            holder.search_read_btn.setBackground(context.getResources().getDrawable(R.drawable.cycle_novel_color));
+        }else if(chosenID == 2){
+            holder.search_read_btn.setBackground(context.getResources().getDrawable(R.drawable.cycle_cartoon_color));
+        }else{
+            holder.search_read_btn.setBackground(context.getResources().getDrawable(R.drawable.cycle_filmtv_color));
+        }
         holder.search_read_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

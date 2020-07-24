@@ -148,7 +148,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
      */
     private void loadSearchResultView() {
         //搜索到结果recyclerview设置
-        searchResultAdapter = new SearchResultAdapter(this, searchResultArrayList);
+        searchResultAdapter = new SearchResultAdapter(this, searchResultArrayList, chosenID);
         search_result_rv.setAdapter(searchResultAdapter);
 
         //搜索结果的回调事件
@@ -157,7 +157,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             public void onClick(SearchResult searchResult) {
                 //发送事件
                 EventBus.getDefault().postSticky(searchResult);
-                ItemDetailActivity.startActivity(context, chosenID, searchResult.getUrl());
+                ItemDetailActivity.startActivity(context, chosenID, searchResult.getUrl(), searchResult.getCover());
             }
         };
         searchResultAdapter.setOnButtonClickListener(buttonClickListener);

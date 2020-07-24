@@ -5,6 +5,7 @@ import android.widget.Toast;
 
 import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.entity.SearchResult;
+import com.example.arrebol.entity.Section;
 import com.example.arrebol.entity.Top;
 
 import org.greenrobot.eventbus.EventBus;
@@ -247,7 +248,7 @@ public class HttpRequestUtils {
      * @return
      */
     public static int parseDetailUrlsJson(String content, ArrayList<Chapter> chapters){
-        Log.d("zcc", "parseDetailUrlsJson: " + content);
+        //Log.d("zcc", "parseDetailUrlsJson: " + content);
         JSONObject object;
         try {
             object = new JSONObject(content);
@@ -276,8 +277,54 @@ public class HttpRequestUtils {
                 chapter.setCurrentChapter(jsonObject.optString("num", "null"));
                 chapter.setUrl(jsonObject.optString("url", "null"));
                 chapters.add(chapter);
+            }
 
+            //Log.d("rainm", "parseCartoonJson: " + searchResults.size());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //Log.d("zcc", "error:" + e.getMessage());
+        }
+        return 0;
+    }
 
+    /**
+     * 解析影视的详细数据
+     * @param content
+     * @param chapters
+     * @return
+     */
+    public static int parseFilmDetailUrlsJson(String content, ArrayList<Section> sections){
+        //Log.d("zcc", "parseDetailUrlsJson: " + content);
+        JSONObject object;
+        try {
+            object = new JSONObject(content);
+            //服务器状态
+            int code = object.optInt("code", -1);
+            //查询结果
+            String message = object.optString("message", "");
+
+            SearchResult result;
+            //Log.d("zcc", "parseNovelJson: " + code + " " + message);
+            if(code == 1){
+                //服务器错误
+                return 1;
+            }
+            if(!message.contains("成功")){
+                //未找到内容
+                return 2;
+            }
+            JSONArray jsonArray = object.getJSONArray("list");
+
+            //Log.d("zcc", jsonArray.length()+"");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // JSON数组里面的具体-JSON对象
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Section section = new Section();
+                section.setCurrentSection(jsonObject.optString("num", "null"));
+                section.setM3u8Url(jsonObject.optString("m3u8url", "null"));
+                section.setDownload(jsonObject.optString("download", "null"));
+                section.setOnlineUrl(jsonObject.optString("onlineurl", "null"));
+                sections.add(section);
             }
 
             //Log.d("rainm", "parseCartoonJson: " + searchResults.size());
