@@ -290,7 +290,7 @@ public class HttpRequestUtils {
     /**
      * 解析影视的详细数据
      * @param content
-     * @param chapters
+     * @param sections
      * @return
      */
     public static int parseFilmDetailUrlsJson(String content, ArrayList<Section> sections){

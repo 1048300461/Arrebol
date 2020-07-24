@@ -19,8 +19,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.arrebol.R;
 import com.example.arrebol.adapter.ChapterAdapter;
+import com.example.arrebol.adapter.SectionAdapter;
 import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.entity.SearchResult;
+import com.example.arrebol.entity.Section;
 import com.example.arrebol.utils.HttpRequestUtils;
 
 import org.greenrobot.eventbus.EventBus;
@@ -52,9 +54,11 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private ImageView cover_iv, reverse_iv;
 
-    private int chosenID = 2;
+    private int chosenID;
 
     private ArrayList<Chapter> characters = new ArrayList<>();
+
+    private ArrayList<Section> sections = new ArrayList<>();
 
     private View split_v;
 
@@ -63,6 +67,9 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     //chapter_rcv的适配器
     private ChapterAdapter chapterAdapter;
+
+    //section的适配器
+    private SectionAdapter sectionAdapter;
 
     private Handler handler = new Handler();
 
@@ -82,11 +89,17 @@ public class ItemDetailActivity extends AppCompatActivity {
         //初始化页面
         initView();
 
+        //初始化数据
         initData();
 
         chapter_rcv.setLayoutManager(new LinearLayoutManager(this));
-        chapterAdapter = new ChapterAdapter(context, characters);
-        chapter_rcv.setAdapter(chapterAdapter);
+        if(chosenID != 3){
+            chapterAdapter = new ChapterAdapter(context, characters);
+            chapter_rcv.setAdapter(chapterAdapter);
+        }else{
+            sectionAdapter = new SectionAdapter(context, sections);
+            chapter_rcv.setAdapter(sectionAdapter);
+        }
 
         initListener();
 
@@ -107,19 +120,26 @@ public class ItemDetailActivity extends AppCompatActivity {
             }
         });
 
-        ChapterAdapter.OnItemClickListener onItemClickListener = new ChapterAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(String url) {
-                if(chosenID == 1){
-                    ReadingNovelActivity.startActivity(context, chosenID, url);
-                }else if(chosenID == 2){
-                    ReadingCartoonActivity.startActivity(context, chosenID, url);
-                }else{
-                    WatchingFilmActivity.startActivity(context, chosenID, url);
+        if(chosenID != 3){
+            ChapterAdapter.OnItemClickListener onItemClickListener = new ChapterAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(String url) {
+                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, url);
+                    if(chosenID == 2) ReadingCartoonActivity.startActivity(context, chosenID, url);
                 }
-            }
-        };
-        chapterAdapter.setOnItemClickListener(onItemClickListener);
+            };
+            chapterAdapter.setOnItemClickListener(onItemClickListener);
+        }else{
+            SectionAdapter.OnItemClickListener onItemClickListener = new SectionAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(Section section) {
+                    WatchingFilmActivity.startActivity(context, section.getM3u8Url(),
+                            section.getOnlineUrl(), section.getDownload());
+                }
+            };
+            sectionAdapter.setOnItemClickListener(onItemClickListener);
+        }
+
     }
 
 
@@ -138,14 +158,14 @@ public class ItemDetailActivity extends AppCompatActivity {
         favorite_btn.setVisibility(View.VISIBLE);
         split_v.setVisibility(View.GONE);
 
+        //如果是影视，则显示观看，否则显示阅读
         if(chosenID != 3){
             search_read_btn.setText(context.getResources().getString(R.string.start_reading));
         }else{
             search_read_btn.setText(context.getResources().getString(R.string.start_watching));
         }
 
-
-
+        //根据chosenID设置button的颜色
         if(chosenID == 1){
             search_read_btn.setBackground(context.getResources().getDrawable(R.drawable.cycle_novel_color));
             favorite_btn.setBackground(context.getResources().getDrawable(R.drawable.cycle_novel_color));
@@ -210,12 +230,15 @@ public class ItemDetailActivity extends AppCompatActivity {
 
                 }else{
                     //当前为影视的内容
-                    HttpRequestUtils.parseDetailUrlsJson(response.body().string(), characters);
+                    HttpRequestUtils.parseFilmDetailUrlsJson(response.body().string(), sections);
                 }
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        chapterAdapter.notifyDataSetChanged();
+                        if(chosenID != 3)
+                            chapterAdapter.notifyDataSetChanged();
+                        else
+                            sectionAdapter.notifyDataSetChanged();
                         //Log.d("zcc", "run: " + characters.size());
                     }
                 });
@@ -246,7 +269,6 @@ public class ItemDetailActivity extends AppCompatActivity {
         search_tag.setText(context.getString(R.string.type) + searchResult.getTag());
         search_author.setText(context.getString(R.string.author) + searchResult.getAuthor());
         search_introduce.setText(context.getString(R.string.introduce) + searchResult.getIntroduce());
-
     }
 
     @Override

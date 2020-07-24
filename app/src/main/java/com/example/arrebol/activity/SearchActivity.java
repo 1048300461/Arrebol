@@ -231,6 +231,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
                 search_v.setIconified(true);
                 search_v.setQuery(name, false);
+
+                //软键盘的显示与隐藏
+                InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
             }
         };
         historySearchAdapter.setOnTextViewClickListener(onTextViewClickListener);
