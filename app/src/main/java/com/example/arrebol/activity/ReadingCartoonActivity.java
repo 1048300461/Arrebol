@@ -51,7 +51,8 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
 
     private ImageView back_iv, favorite_iv, share_iv;
     private SeekBar cartoon_read_sb;
-    private TextView cartoon_previous_tv, cartoon_next_tv, current_chapter_tv;
+    private TextView cartoon_previous_tv, cartoon_next_tv,
+            current_chapter_tv, current_page_tv;
 
     private RecyclerView cartoon_content_rcv;
     private CartoonContentAdapter cartoonContentAdapter;
@@ -67,13 +68,8 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
 
         chosenID = getIntent().getIntExtra("chosenID", 1);
         chapter = (Chapter) getIntent().getSerializableExtra("chapter");
-        url = chapter.getUrl();
 
-        initView();
-
-        initListener();
-
-        initData();
+        reloadView();
 
         //Log.d("zcc", "onCreate: " + chosenID + " "+ url);
     }
@@ -83,20 +79,7 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
         CartoonContentAdapter.OnItemClickListener onItemClickListener = new CartoonContentAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                //顶部操作栏的显示与隐藏
-                if (cartoon_content_top_rl.getVisibility() == View.VISIBLE) {
-                    cartoon_content_top_rl.setVisibility(View.GONE);
-                } else {
-                    cartoon_content_top_rl.setVisibility(View.VISIBLE);
-                }
-
-                //底部操作栏的显示与隐藏
-                if (cartoon_content_bottom_ll.getVisibility() == View.VISIBLE) {
-                    cartoon_content_bottom_ll.setVisibility(View.GONE);
-                } else {
-                    cartoon_content_bottom_ll.setVisibility(View.VISIBLE);
-                }
-
+                hideOrHidden();
                 cartoon_read_sb.setProgress(position);
             }
         };
@@ -110,9 +93,13 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
 
         cartoon_read_sb.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                Toast.makeText(context, "当前进度" + (i+1) + "/" + imgUrls.size(), Toast.LENGTH_SHORT).show();
-                cartoon_content_rcv.smoothScrollToPosition(i);
+            public void onProgressChanged(SeekBar seekBar, int i, boolean fromUser) {
+
+                if(fromUser){
+                    Toast.makeText(context, "当前进度" + (i+1) + "/" + imgUrls.size(), Toast.LENGTH_SHORT).show();
+                    cartoon_content_rcv.scrollToPosition(i);
+                }
+
             }
 
             @Override
@@ -126,10 +113,45 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
             }
         });
         cartoon_content_rcv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            //用来标记是否正在向最后一个滑动
+            boolean isSlidingToLast = false;
+
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 Log.d("zcc", "onScrollStateChanged: " + newState);
+                LinearLayoutManager manager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                //当不滚动时
+                if(newState == RecyclerView.SCROLL_STATE_IDLE){
+                    //获取最后一个完全显示的ItemPosition
+                    int lastVisibleItem = manager.findLastCompletelyVisibleItemPosition();
+                    //获取item的数目
+                    int totalItemCount = manager.getItemCount();
+
+
+                    //获取第一个完全显示的ItemPosition
+                    int firstVisibleItem = manager.findFirstCompletelyVisibleItemPosition();
+
+
+                    //找到当前最后显示的图片item位置
+                    cartoon_read_sb.setProgress(manager.findFirstVisibleItemPosition());
+                    //更新当前页数显示
+                    current_page_tv.setText((manager.findFirstVisibleItemPosition() + 1) + " / " + imgUrls.size());
+
+                    if((lastVisibleItem == (totalItemCount - 1) && isSlidingToLast) || firstVisibleItem == 0){
+                        hideOrHidden();
+                    }
+
+                }else{
+                    cartoon_read_sb.setProgress(manager.findLastVisibleItemPosition());
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                isSlidingToLast = dy > 0;
             }
         });
     }
@@ -145,7 +167,9 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
         cartoon_previous_tv = findViewById(R.id.cartoon_previous_tv);
         cartoon_next_tv = findViewById(R.id.cartoon_next_tv);
         current_chapter_tv = findViewById(R.id.current_chapter_tv);
+        current_page_tv = findViewById(R.id.current_page_tv);
 
+        //初始化章节名称
         current_chapter_tv.setText(chapter.getCurrentChapterName());
 
         cartoon_content_rcv.setLayoutManager(new LinearLayoutManager(this));
@@ -183,6 +207,8 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
                         //设置seekbar的最大进度
                         cartoon_read_sb.setMax(imgUrls.size() - 1);
                         cartoon_read_sb.setProgress(0);
+                        //初始化阅读页数
+                        current_page_tv.setText("1 / " + imgUrls.size());
                     }
                 });
             }
@@ -250,6 +276,9 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
         }
     }
 
+    /**
+     * 加载视图
+     */
     public void reloadView(){
         url = chapter.getUrl();
 
@@ -258,6 +287,24 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
         initListener();
 
         initData();
+
+        Toast.makeText(context, chapter.getCurrentChapterName(), Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 隐藏或显示操作栏
+     */
+    public void hideOrHidden(){
+        //顶部操作栏的显示与隐藏 底部操作栏的显示与隐藏
+        if (cartoon_content_top_rl.getVisibility() == View.VISIBLE) {
+            cartoon_content_top_rl.setVisibility(View.GONE);
+            cartoon_content_bottom_ll.setVisibility(View.GONE);
+            current_page_tv.setVisibility(View.VISIBLE);
+        } else {
+            cartoon_content_top_rl.setVisibility(View.VISIBLE);
+            cartoon_content_bottom_ll.setVisibility(View.VISIBLE);
+            current_page_tv.setVisibility(View.GONE);
+        }
     }
 
 }
