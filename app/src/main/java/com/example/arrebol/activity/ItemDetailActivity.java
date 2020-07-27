@@ -122,7 +122,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             ChapterAdapter.OnItemClickListener onItemClickListener = new ChapterAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Chapter chapter) {
-                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, chapter.getUrl());
+                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, chapter);
                     if(chosenID == 2) {
                         ReadingCartoonActivity.startActivity(context, chosenID, chapter);
                     }
@@ -143,6 +143,9 @@ public class ItemDetailActivity extends AppCompatActivity {
         search_read_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if(chosenID == 1) {
+                    ReadingNovelActivity.startActivity(context, chosenID, chapters.get(0));
+                }
                 if(chosenID == 2){
                     ReadingCartoonActivity.startActivity(context, chosenID, chapters.get(0));
                 }

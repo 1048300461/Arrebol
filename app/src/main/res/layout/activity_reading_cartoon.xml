@@ -107,4 +107,18 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/current_page_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20 / 26"
+        android:textColor="@color/colorWhite"
+        android:textSize="@dimen/history_text_size"
+        app:layout_constraintRight_toRightOf="parent"
+        android:padding="5dp"
+        android:background="@color/colorBlack"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="5dp"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

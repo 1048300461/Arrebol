@@ -8,11 +8,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.example.arrebol.R;
+import com.example.arrebol.entity.Chapter;
 
 public class ReadingNovelActivity extends AppCompatActivity {
 
     private int chosenID;
     private String url;
+    private Chapter chapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +22,8 @@ public class ReadingNovelActivity extends AppCompatActivity {
         setContentView(R.layout.activity_reading_novel);
 
         chosenID = getIntent().getIntExtra("chosenID", 1);
-        url = getIntent().getStringExtra("url");
+        chapter = (Chapter) getIntent().getSerializableExtra("chapter");
+        url = chapter.getUrl();
 
         Log.d("zcc", "onCreate: " + chosenID + " "+ url);
     }
@@ -28,10 +31,10 @@ public class ReadingNovelActivity extends AppCompatActivity {
     /**
      * 启动活动
      */
-    public static void startActivity(Context context, int chosenID, String detailUrl){
+    public static void startActivity(Context context, int chosenID, Chapter chapter){
         Intent intent = new Intent(context, ReadingNovelActivity.class);
         intent.putExtra("chosenID", chosenID);
-        intent.putExtra("url", detailUrl);
+        intent.putExtra("chapter", chapter);
         context.startActivity(intent);
     }
 }
