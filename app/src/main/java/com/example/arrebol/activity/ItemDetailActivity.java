@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -29,7 +28,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,7 +54,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
     private int chosenID;
 
-    private ArrayList<Chapter> characters = new ArrayList<>();
+    private ArrayList<Chapter> chapters = new ArrayList<>();
 
     private ArrayList<Section> sections = new ArrayList<>();
 
@@ -94,7 +92,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 
         chapter_rcv.setLayoutManager(new LinearLayoutManager(this));
         if(chosenID != 3){
-            chapterAdapter = new ChapterAdapter(context, characters);
+            chapterAdapter = new ChapterAdapter(context, chapters);
             chapter_rcv.setAdapter(chapterAdapter);
         }else{
             sectionAdapter = new SectionAdapter(context, sections);
@@ -113,7 +111,7 @@ public class ItemDetailActivity extends AppCompatActivity {
         reverse_iv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Collections.reverse(characters);
+                Collections.reverse(chapters);
                 chapterAdapter.notifyDataSetChanged();
                 //滑动到顶部
                 chapter_rcv.scrollToPosition(0);
@@ -123,10 +121,11 @@ public class ItemDetailActivity extends AppCompatActivity {
         if(chosenID != 3){
             ChapterAdapter.OnItemClickListener onItemClickListener = new ChapterAdapter.OnItemClickListener() {
                 @Override
-                public void onItemClick(String url) {
-                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, url);
-                    if(chosenID == 2) ReadingCartoonActivity.startActivity(context, chosenID, url);
-
+                public void onItemClick(Chapter chapter) {
+                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, chapter.getUrl());
+                    if(chosenID == 2) {
+                        ReadingCartoonActivity.startActivity(context, chosenID, chapter);
+                    }
                 }
             };
             chapterAdapter.setOnItemClickListener(onItemClickListener);
@@ -140,6 +139,15 @@ public class ItemDetailActivity extends AppCompatActivity {
             };
             sectionAdapter.setOnItemClickListener(onItemClickListener);
         }
+
+        search_read_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(chosenID == 2){
+                    ReadingCartoonActivity.startActivity(context, chosenID, chapters.get(0));
+                }
+            }
+        });
 
     }
 
@@ -200,7 +208,7 @@ public class ItemDetailActivity extends AppCompatActivity {
 //            Chapter chapter = new Chapter("第" + i + "章", i+"");
 //            characters.add(chapter);
 //        }
-        characters.clear();
+        chapters.clear();
 
         Map<String, String> params = new HashMap<>();
         if(chosenID == 1) params.put("xsurl1", detailUrl);
@@ -227,8 +235,23 @@ public class ItemDetailActivity extends AppCompatActivity {
                 if(chosenID == 1 || chosenID == 2){
                     // 当前为小说和漫画的详细内容
                     //Log.d("zcc", "onResponse: " + response.body().toString());
-                    HttpRequestUtils.parseDetailUrlsJson(response.body().string(), characters);
+                    HttpRequestUtils.parseDetailUrlsJson(response.body().string(), chapters);
 
+                    //初始化chapters的数据
+                    for(int i = 0; i < chapters.size(); i++){
+                        if(i == 0){
+                            //有后继无前驱
+                            chapters.get(i).setNextChapter(chapters.get(i+1));
+                            chapters.get(i).setPreviousChapter(null);
+                        }else if(i == chapters.size() - 1){
+                            //有前驱无后继
+                            chapters.get(i).setNextChapter(null);
+                            chapters.get(i).setPreviousChapter(chapters.get(i-1));
+                        }else{
+                            chapters.get(i).setNextChapter(chapters.get(i+1));
+                            chapters.get(i).setPreviousChapter(chapters.get(i-1));
+                        }
+                    }
                 }else{
                     //当前为影视的内容
                     HttpRequestUtils.parseFilmDetailUrlsJson(response.body().string(), sections);

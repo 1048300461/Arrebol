@@ -6,9 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".activity.WatchingFilmActivity">
 
-    <VideoView
-        android:id="@+id/video_vv"
+    <com.google.android.exoplayer2.ui.PlayerView
+        android:id="@+id/explayer_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="260dp"/>
+
 
 </LinearLayout>

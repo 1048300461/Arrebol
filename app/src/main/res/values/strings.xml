@@ -21,4 +21,8 @@
     <string name="catalog">Catalog</string>
     <string name="detail">Detail</string>
     <string name="reverse">Reverse</string>
+    <string name="previous_chapter">Previous</string>
+    <string name="next_chapter">Next</string>
+    <string name="no_previous_chapter">There is no previous chapter</string>
+    <string name="no_next_chapter">There is no next chapter</string>
 </resources>
