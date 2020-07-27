@@ -1,7 +1,6 @@
 package com.example.arrebol.utils;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.entity.SearchResult;
@@ -16,10 +15,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -274,7 +270,7 @@ public class HttpRequestUtils {
                 // JSON数组里面的具体-JSON对象
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Chapter chapter = new Chapter();
-                chapter.setCurrentChapter(jsonObject.optString("num", "null"));
+                chapter.setCurrentChapterName(jsonObject.optString("num", "null"));
                 chapter.setUrl(jsonObject.optString("url", "null"));
                 chapters.add(chapter);
             }
@@ -325,6 +321,47 @@ public class HttpRequestUtils {
                 section.setDownload(jsonObject.optString("download", "null"));
                 section.setOnlineUrl(jsonObject.optString("onlineurl", "null"));
                 sections.add(section);
+            }
+
+            //Log.d("rainm", "parseCartoonJson: " + searchResults.size());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //Log.d("zcc", "error:" + e.getMessage());
+        }
+        return 0;
+    }
+
+    /**
+     * 解析漫画的内容
+     */
+    public static int parseCartoonContentJson(String content, ArrayList<String> imgUrls){
+        //Log.d("zcc", "parseDetailUrlsJson: " + content);
+        JSONObject object;
+        try {
+            object = new JSONObject(content);
+            //服务器状态
+            int code = object.optInt("code", -1);
+            //查询结果
+            String message = object.optString("message", "");
+
+            SearchResult result;
+            //Log.d("zcc", "parseNovelJson: " + code + " " + message);
+            if(code == 1){
+                //服务器错误
+                return 1;
+            }
+            if(!message.contains("成功")){
+                //未找到内容
+                return 2;
+            }
+            JSONArray jsonArray = object.getJSONArray("list");
+
+            //Log.d("zcc", jsonArray.length()+"");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                // JSON数组里面的具体-JSON对象
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                imgUrls.add(jsonObject.optString("img", "null"));
+                Log.d("zcc", "parseCartoonContentJson: " + imgUrls.get(i));
             }
 
             //Log.d("rainm", "parseCartoonJson: " + searchResults.size());

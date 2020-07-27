@@ -22,4 +22,8 @@
     <string name="catalog">目录</string>
     <string name="detail">详情</string>
     <string name="reverse">倒序</string>
+    <string name="previous_chapter">上一话</string>
+    <string name="next_chapter">下一话</string>
+    <string name="no_previous_chapter">没有上一话啦</string>
+    <string name="no_next_chapter">没有下一话啦</string>
 </resources>

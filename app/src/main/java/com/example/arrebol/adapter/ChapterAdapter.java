@@ -35,12 +35,12 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
 
     @Override
     public void onBindViewHolder(@NonNull final ChapterViewHolder holder, final int position) {
-        holder.chapter_name_tv.setText(chapterArrayList.get(position).getCurrentChapter());
+        holder.chapter_name_tv.setText(chapterArrayList.get(position).getCurrentChapterName());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onItemClickListener.onItemClick(chapterArrayList.get(position).getUrl());
+                onItemClickListener.onItemClick(chapterArrayList.get(position));
             }
         });
     }
@@ -70,6 +70,6 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     }
 
     public interface OnItemClickListener{
-        void onItemClick(String url);
+        void onItemClick(Chapter chapter);
     }
 }
