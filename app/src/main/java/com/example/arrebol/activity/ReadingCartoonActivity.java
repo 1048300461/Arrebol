@@ -69,8 +69,11 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
         chosenID = getIntent().getIntExtra("chosenID", 1);
         chapter = (Chapter) getIntent().getSerializableExtra("chapter");
 
+        initView();
+
         reloadView();
 
+        initListener();
         //Log.d("zcc", "onCreate: " + chosenID + " "+ url);
     }
 
@@ -132,7 +135,6 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
                     //获取第一个完全显示的ItemPosition
                     int firstVisibleItem = manager.findFirstCompletelyVisibleItemPosition();
 
-
                     //找到当前最后显示的图片item位置
                     cartoon_read_sb.setProgress(manager.findFirstVisibleItemPosition());
                     //更新当前页数显示
@@ -150,7 +152,7 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
+                Log.d("zcc", "onScrolled: ");
                 isSlidingToLast = dy > 0;
             }
         });
@@ -281,11 +283,6 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
      */
     public void reloadView(){
         url = chapter.getUrl();
-
-        initView();
-
-        initListener();
-
         initData();
 
         Toast.makeText(context, chapter.getCurrentChapterName(), Toast.LENGTH_SHORT).show();
