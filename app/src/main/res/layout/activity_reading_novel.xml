@@ -6,10 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".activity.ReadingNovelActivity">
 
-    <TextView
-        android:id="@+id/content_tv"
+    <com.example.arrebol.widget.Reader.TwistView
+        android:id="@+id/reading_page"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:textSize="@dimen/input_text_size" />
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
