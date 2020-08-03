@@ -1,11 +1,13 @@
 package com.example.arrebol.entity;
 
+import java.io.Serializable;
+
 /**
  * 动漫电影章节的实体类
  * @author zc
  * @time 2020/07/23
  */
-public class Section {
+public class Section implements Serializable {
     //当前的集数
     private String currentSection;
     private String m3u8Url;

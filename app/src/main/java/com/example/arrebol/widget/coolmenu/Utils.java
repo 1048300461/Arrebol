@@ -3,7 +3,7 @@ package com.example.arrebol.widget.coolmenu;
 import android.content.Context;
 import android.util.DisplayMetrics;
 
-final class Utils {
+class Utils {
 
     private Utils() {}
 

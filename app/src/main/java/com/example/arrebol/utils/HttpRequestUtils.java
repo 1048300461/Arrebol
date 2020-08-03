@@ -372,4 +372,46 @@ public class HttpRequestUtils {
         return 0;
     }
 
+    /**
+     * 解析小说的内容
+     */
+    public static int parseNovelContentJson(String content, ArrayList<String> contents){
+        //Log.d("zcc", "parseDetailUrlsJson: " + content);
+        JSONObject object;
+        try {
+            object = new JSONObject(content);
+            //服务器状态
+            int code = object.optInt("code", -1);
+            //查询结果
+            String message = object.optString("message", "");
+
+            //章节名
+            String chapterName = object.optString("num", "null");
+            contents.add(chapterName);
+
+            Log.d("zcc", "parseNovelJson: " + chapterName);
+            if(code == 1){
+                //服务器错误
+                return 1;
+            }
+            if(!message.contains("成功")){
+                //未找到内容
+                return 2;
+            }
+            JSONArray jsonArray = object.getJSONArray("content");
+
+            //Log.d("zcc", jsonArray.length()+"");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                contents.add(jsonArray.getString(i));
+                //Log.d("zcc", "parseCartoonContentJson: " + jsonArray.getString(i));
+            }
+
+            //Log.d("rainm", "parseCartoonJson: " + searchResults.size());
+        } catch (JSONException e) {
+            e.printStackTrace();
+            //Log.d("zcc", "error:" + e.getMessage());
+        }
+        return 0;
+    }
+
 }

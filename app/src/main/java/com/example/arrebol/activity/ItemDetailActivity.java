@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -122,7 +123,9 @@ public class ItemDetailActivity extends AppCompatActivity {
             ChapterAdapter.OnItemClickListener onItemClickListener = new ChapterAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Chapter chapter) {
-                    if(chosenID == 1) ReadingNovelActivity.startActivity(context, chosenID, chapter);
+                    if(chosenID == 1){
+                        ReadingNovelActivity.startActivity(context, chosenID, chapter);
+                    }
                     if(chosenID == 2) {
                         ReadingCartoonActivity.startActivity(context, chosenID, chapter);
                     }
@@ -133,8 +136,7 @@ public class ItemDetailActivity extends AppCompatActivity {
             SectionAdapter.OnItemClickListener onItemClickListener = new SectionAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(Section section) {
-                    WatchingFilmActivity.startActivity(context, section.getM3u8Url(),
-                            section.getOnlineUrl(), section.getDownload());
+                    WatchingFilmActivity.startActivity(context, section);
                 }
             };
             sectionAdapter.setOnItemClickListener(onItemClickListener);
@@ -255,6 +257,9 @@ public class ItemDetailActivity extends AppCompatActivity {
                             chapters.get(i).setPreviousChapter(chapters.get(i-1));
                         }
                     }
+
+                    Log.d("zcc", "onResponse: " + chapters.get(1).getNextChapter() + " " + chapters.get(2));
+                    
                 }else{
                     //当前为影视的内容
                     HttpRequestUtils.parseFilmDetailUrlsJson(response.body().string(), sections);
