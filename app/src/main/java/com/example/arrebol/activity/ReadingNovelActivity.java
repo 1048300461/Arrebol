@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -13,12 +15,14 @@ import android.widget.Toast;
 import com.example.arrebol.R;
 import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.utils.HttpRequestUtils;
+import com.example.arrebol.widget.Reader.TwistView;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -30,10 +34,10 @@ public class ReadingNovelActivity extends AppCompatActivity {
     private int chosenID;
     private String url;
     private Chapter chapter;
-    private TextView content_tv;
     private Handler handler = new Handler();
     private Context context;
     private ArrayList<String> contents = new ArrayList<>();
+    private TwistView twistView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,7 @@ public class ReadingNovelActivity extends AppCompatActivity {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        content_tv.setText(contents.get(0) + "\n" + contents.get(1) + contents.get(2));
+                        //content_tv.setText(contents.get(0) + "\n" + contents.get(1) + contents.get(2));
                     }
                 });
             }
@@ -91,7 +95,23 @@ public class ReadingNovelActivity extends AppCompatActivity {
      * 初始化视图
      */
     private void initView() {
-        content_tv = findViewById(R.id.content_tv);
+        twistView = findViewById(R.id.reading_page);
+
+        Bitmap bitmap = null;
+        List<Bitmap> bitmaps = new ArrayList<>();
+
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_a);
+        bitmaps.add(bitmap);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_b);
+        bitmaps.add(bitmap);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_c);
+        bitmaps.add(bitmap);
+//        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_d);
+//        bitmaps.add(bitmap);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_e);
+        bitmaps.add(bitmap);
+
+        twistView.setBitmaps(bitmaps);
     }
 
     /**
