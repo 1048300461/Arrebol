@@ -211,6 +211,8 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
                         cartoon_read_sb.setProgress(0);
                         //初始化阅读页数
                         current_page_tv.setText("1 / " + imgUrls.size());
+                        cartoon_content_rcv.scrollToPosition(0);
+                        current_chapter_tv.setText(chapter.getCurrentChapterName());
                     }
                 });
             }
@@ -284,6 +286,7 @@ public class ReadingCartoonActivity extends AppCompatActivity implements View.On
     public void reloadView(){
         url = chapter.getUrl();
         initData();
+
 
         Toast.makeText(context, chapter.getCurrentChapterName(), Toast.LENGTH_SHORT).show();
     }

@@ -200,8 +200,14 @@ public class TwistView extends View {
 		// 用来装载Path边界值的RectF对象
 		RectF rectShortSize = new RectF();
 
-		// 添加圆形 到Path
-		pathShortSize.addCircle(0, mViewHeight, mViewWidth, Path.Direction.CCW);
+		if(mSlide == Slide.RIGHT_TOP){
+			//如果是右上滑动则圆心就与之前不一样，需要改变
+			pathShortSize.addCircle(0, 0, mViewWidth, Path.Direction.CCW);
+		}else{
+			// 添加圆形 到Path
+			pathShortSize.addCircle(0, mViewHeight, mViewWidth, Path.Direction.CCW);
+		}
+
 
 		// 计算边界
 		pathShortSize.computeBounds(rectShortSize, true);
@@ -253,12 +259,19 @@ public class TwistView extends View {
 		 * 缓冲区域判断
 		 */
 		float area = mViewHeight - mBuffArea;
-		if (!isSlide && mPointY >= area) {
+		if(!isSlide && mPointY <= mBuffArea){
+			Log.d("zcc", "mPointY: " + mPointY + " area：" + area);
+			mPointY = area;
+		}else if (!isSlide && mPointY >= area) {
+			Log.d("zcc", "mPointY: " + mPointY + " area：" + area);
 			mPointY = area;
 		}
 
 		float mK = mViewWidth - mPointX;
 		float mL = mViewHeight - mPointY;
+		if(mSlide == Slide.RIGHT_TOP){
+			mL = mPointY;
+		}
 
 		// 需要重复使用的参数存值避免重复计算
 		float temp = (float) (Math.pow(mL, 2) + Math.pow(mK, 2));
@@ -269,298 +282,359 @@ public class TwistView extends View {
 		float sizeShort = temp / (2F * mK);
 		float sizeLong = temp / (2F * mL);
 
-		float tempAM = mK - sizeShort;
-
-		/*
-		 * 根据长短边边长计算旋转角度并确定mRatio的值
-		 */
-		if (sizeShort < sizeLong) {
-			mRatio = Ratio.SHORT;
-			float sin = tempAM / sizeShort;
-			mDegrees = (float) (Math.asin(sin) / Math.PI * 180);
-		} else {
-			mRatio = Ratio.LONG;
-			float cos = mK / sizeLong;
-			mDegrees = (float) (Math.acos(cos) / Math.PI * 180);
-		}
-
-		if (sizeLong > mViewHeight) {
-			// 计算AN边
-			float an = sizeLong - mViewHeight;
-
-			// 三角形AMN的MN边
-			float largerTrianShortSize = an / (sizeLong - (mViewHeight - mPointY)) * (mViewWidth - mPointX);
-
-			// 三角形的AQN的QN边
-			float smallTrianShortSize = an / sizeLong * sizeShort;
-
-			/*
-			 * 计算参数
-			 */
-			float topX1 = mViewWidth - largerTrianShortSize;
-			float topX2 = mViewWidth - smallTrianShortSize;
-			float btmX2 = mViewWidth - sizeShort;
-
-			// 计算曲线起点
-			float startXBtm = btmX2 - CURVATURE * sizeShort;
-			float startYBtm = mViewHeight;
-
-			// 计算曲线终点
-			float endXBtm = mPointX + (1 - CURVATURE) * (tempAM);
-			float endYBtm = mPointY + (1 - CURVATURE) * mL;
-
-			// 计算曲线控制点
-			float controlXBtm = btmX2;
-			float controlYBtm = mViewHeight;
-
-			// 计算曲线顶点
-			float bezierPeakXBtm = 0.25F * startXBtm + 0.5F * controlXBtm + 0.25F * endXBtm;
-			float bezierPeakYBtm = 0.25F * startYBtm + 0.5F * controlYBtm + 0.25F * endYBtm;
-
-			/*
-			 * 生成带曲线的四边形路径
-			 */
-			mPath.moveTo(startXBtm, startYBtm);
-			mPath.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPath.lineTo(mPointX, mPointY);
-			mPath.lineTo(topX1, 0);
-			mPath.lineTo(topX2, 0);
-
-			/*
-			 * 替补区域Path
-			 */
-			mPathTrap.moveTo(startXBtm, startYBtm);
-			mPathTrap.lineTo(topX2, 0);
-			mPathTrap.lineTo(bezierPeakXBtm, bezierPeakYBtm);
-			mPathTrap.close();
-
-			/*
-			 * 底部月半圆Path
-			 */
-			mPathSemicircleBtm.moveTo(startXBtm, startYBtm);
-			mPathSemicircleBtm.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPathSemicircleBtm.close();
-
-			/*
-			 * 生成包含折叠和下一页的路径
-			 */
-			mPathFoldAndNext.moveTo(startXBtm, startYBtm);
-			mPathFoldAndNext.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPathFoldAndNext.lineTo(mPointX, mPointY);
-			mPathFoldAndNext.lineTo(topX1, 0);
-			mPathFoldAndNext.lineTo(mViewWidth, 0);
-			mPathFoldAndNext.lineTo(mViewWidth, mViewHeight);
-			mPathFoldAndNext.close();
-
-			// 计算月半圆区域
-			mRegionSemicircle = computeRegion(mPathSemicircleBtm);
-		} else {
-			/*
-			 * 计算参数
-			 */
-			float leftY = mViewHeight - sizeLong;
-			float btmX = mViewWidth - sizeShort;
-
-			// 计算曲线起点
-			float startXBtm = btmX - CURVATURE * sizeShort;
-			float startYBtm = mViewHeight;
-			float startXLeft = mViewWidth;
-			float startYLeft = leftY - CURVATURE * sizeLong;
-
-			// 计算曲线终点
-			float endXBtm = mPointX + (1 - CURVATURE) * (tempAM);
-			float endYBtm = mPointY + (1 - CURVATURE) * mL;
-			float endXLeft = mPointX + (1 - CURVATURE) * mK;
-			float endYLeft = mPointY - (1 - CURVATURE) * (sizeLong - mL);
-
-			// 计算曲线控制点
-			float controlXBtm = btmX;
-			float controlYBtm = mViewHeight;
-			float controlXLeft = mViewWidth;
-			float controlYLeft = leftY;
-
-			// 计算曲线顶点
-			float bezierPeakXBtm = 0.25F * startXBtm + 0.5F * controlXBtm + 0.25F * endXBtm;
-			float bezierPeakYBtm = 0.25F * startYBtm + 0.5F * controlYBtm + 0.25F * endYBtm;
-			float bezierPeakXLeft = 0.25F * startXLeft + 0.5F * controlXLeft + 0.25F * endXLeft;
-			float bezierPeakYLeft = 0.25F * startYLeft + 0.5F * controlYLeft + 0.25F * endYLeft;
-
-			/*
-			 * 限制右侧曲线起点
-			 */
-			if (startYLeft <= 0) {
-				startYLeft = 0;
+		if(mSlide == Slide.RIGHT_TOP){
+			if(sizeShort < sizeLong){
+				mRatio = Ratio.SHORT;
+				float sin = (mK - sizeShort) / sizeShort;
+				mDegrees = (float) (Math.asin(sin) / Math.PI * 180);
+			} else {
+				mRatio = Ratio.LONG;
+				float cos = mK / sizeLong;
+				mDegrees = (float) (Math.acos(cos) / Math.PI * 180);
 			}
 
+			//移动路径起点到触摸点
+			mPath.moveTo(mPointX, mPointY);
+			mPathFoldAndNext.moveTo(mPointX, mPointY);
+
+			if(sizeLong > mViewHeight){
+				//计算an边
+				float an = sizeLong - mViewHeight;
+
+				// 三角形AMN的MN边
+				float largerTrianShortSize = an / (sizeLong - mPointY) * (mViewWidth - mPointX);
+
+				// 三角形AQN的QN边
+				float smallTrianShortSize = an / sizeLong * sizeShort;
+
+				//计算参数
+				float topX1 = mViewWidth - largerTrianShortSize;
+				float topX2 = mViewWidth - smallTrianShortSize;
+				float btmX2 = mViewWidth - sizeShort;
+
+				//生成四边形路径
+				mPath.lineTo(topX1, mViewHeight);
+				mPath.lineTo(topX2, mViewHeight);
+				mPath.lineTo(btmX2, 0);
+				mPath.close();
+
+				//生成包含折叠和下一页的路径
+				mPathFoldAndNext.lineTo(topX1, mViewHeight);
+				mPathFoldAndNext.lineTo(mViewWidth, mViewHeight);
+				mPathFoldAndNext.lineTo(mViewWidth, 0);
+				mPathFoldAndNext.lineTo(btmX2, 0);
+				mPathFoldAndNext.close();
+			}else{
+				//计算参数
+				float leftY = sizeLong;
+				float btmX = mViewWidth - sizeShort;
+
+				//生成三角形路径
+				mPath.lineTo(mViewWidth, sizeLong);
+				mPath.lineTo(mViewWidth - sizeShort, 0);
+				mPath.close();
+
+				//生成包含折叠路径和下一页的路径
+				mPathFoldAndNext.lineTo(mViewWidth, leftY);
+				mPathFoldAndNext.lineTo(mViewWidth, 0);
+				mPathFoldAndNext.lineTo(btmX, 0);
+				mPathFoldAndNext.close();
+			}
+		}else{
+			float tempAM = mK - sizeShort;
+
 			/*
-			 * 限制底部左侧曲线起点
+			 * 根据长短边边长计算旋转角度并确定mRatio的值
 			 */
-			if (startXBtm <= 0) {
-				startXBtm = 0;
+			if (sizeShort < sizeLong) {
+				mRatio = Ratio.SHORT;
+				float sin = tempAM / sizeShort;
+				mDegrees = (float) (Math.asin(sin) / Math.PI * 180);
+			} else {
+				mRatio = Ratio.LONG;
+				float cos = mK / sizeLong;
+				mDegrees = (float) (Math.acos(cos) / Math.PI * 180);
 			}
 
-			/*
-			 * 根据底部左侧限制点重新计算贝塞尔曲线顶点坐标
-			 */
-			float partOfShortLength = CURVATURE * sizeShort;
-			if (btmX >= -mValueAdded && btmX <= partOfShortLength - mValueAdded) {
-				float f = btmX / partOfShortLength;
-				float t = 0.5F * f;
+			if (sizeLong > mViewHeight) {
+				// 计算AN边
+				float an = sizeLong - mViewHeight;
 
-				float bezierPeakTemp = 1 - t;
-				float bezierPeakTemp1 = bezierPeakTemp * bezierPeakTemp;
-				float bezierPeakTemp2 = 2 * t * bezierPeakTemp;
-				float bezierPeakTemp3 = t * t;
+				// 三角形AMN的MN边
+				float largerTrianShortSize = an / (sizeLong - (mViewHeight - mPointY)) * (mViewWidth - mPointX);
 
-				bezierPeakXBtm = bezierPeakTemp1 * startXBtm + bezierPeakTemp2 * controlXBtm + bezierPeakTemp3 * endXBtm;
-				bezierPeakYBtm = bezierPeakTemp1 * startYBtm + bezierPeakTemp2 * controlYBtm + bezierPeakTemp3 * endYBtm;
-			}
+				// 三角形的AQN的QN边
+				float smallTrianShortSize = an / sizeLong * sizeShort;
 
-			/*
-			 * 根据右侧限制点重新计算贝塞尔曲线顶点坐标
-			 */
-			float partOfLongLength = CURVATURE * sizeLong;
-			if (leftY >= -mValueAdded && leftY <= partOfLongLength - mValueAdded) {
-				float f = leftY / partOfLongLength;
-				float t = 0.5F * f;
+				/*
+				 * 计算参数
+				 */
+				float topX1 = mViewWidth - largerTrianShortSize;
+				float topX2 = mViewWidth - smallTrianShortSize;
+				float btmX2 = mViewWidth - sizeShort;
 
-				float bezierPeakTemp = 1 - t;
-				float bezierPeakTemp1 = bezierPeakTemp * bezierPeakTemp;
-				float bezierPeakTemp2 = 2 * t * bezierPeakTemp;
-				float bezierPeakTemp3 = t * t;
+				// 计算曲线起点
+				float startXBtm = btmX2 - CURVATURE * sizeShort;
+				float startYBtm = mViewHeight;
 
-				bezierPeakXLeft = bezierPeakTemp1 * startXLeft + bezierPeakTemp2 * controlXLeft + bezierPeakTemp3 * endXLeft;
-				bezierPeakYLeft = bezierPeakTemp1 * startYLeft + bezierPeakTemp2 * controlYLeft + bezierPeakTemp3 * endYLeft;
-			}
+				// 计算曲线终点
+				float endXBtm = mPointX + (1 - CURVATURE) * (tempAM);
+				float endYBtm = mPointY + (1 - CURVATURE) * mL;
 
-			// 计算底部扭曲的起始细分下标
-			mSubWidthStart = Math.round((btmX / mSubMinWidth)) - 1;
-			mSubWidthEnd = Math.round(((btmX + CURVATURE * sizeShort) / mSubMinWidth)) + 1;
+				// 计算曲线控制点
+				float controlXBtm = btmX2;
+				float controlYBtm = mViewHeight;
 
-			// 计算右侧扭曲的起始细分下标
-			mSubHeightStart = (int) (leftY / mSubMinHeight) - 1;
-			mSubHeightEnd = (int) (leftY + CURVATURE * sizeLong / mSubMinHeight) + 1;
+				// 计算曲线顶点
+				float bezierPeakXBtm = 0.25F * startXBtm + 0.5F * controlXBtm + 0.25F * endXBtm;
+				float bezierPeakYBtm = 0.25F * startYBtm + 0.5F * controlYBtm + 0.25F * endYBtm;
 
-			/*
-			 * 生成折叠区域的扭曲坐标
-			 */
-			int index = 0;
+				/*
+				 * 生成带曲线的四边形路径
+				 */
+				mPath.moveTo(startXBtm, startYBtm);
+				mPath.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPath.lineTo(mPointX, mPointY);
+				mPath.lineTo(topX1, 0);
+				mPath.lineTo(topX2, 0);
 
-			// 长边偏移
-			float offsetLong = CURVATURE / 2F * sizeLong;
+				/*
+				 * 替补区域Path
+				 */
+				mPathTrap.moveTo(startXBtm, startYBtm);
+				mPathTrap.lineTo(topX2, 0);
+				mPathTrap.lineTo(bezierPeakXBtm, bezierPeakYBtm);
+				mPathTrap.close();
 
-			// 长边偏移倍增
-			float mulOffsetLong = 1.0F;
+				/*
+				 * 底部月半圆Path
+				 */
+				mPathSemicircleBtm.moveTo(startXBtm, startYBtm);
+				mPathSemicircleBtm.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPathSemicircleBtm.close();
 
-			// 短边偏移
-			float offsetShort = CURVATURE / 2F * sizeShort;
+				/*
+				 * 生成包含折叠和下一页的路径
+				 */
+				mPathFoldAndNext.moveTo(startXBtm, startYBtm);
+				mPathFoldAndNext.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPathFoldAndNext.lineTo(mPointX, mPointY);
+				mPathFoldAndNext.lineTo(topX1, 0);
+				mPathFoldAndNext.lineTo(mViewWidth, 0);
+				mPathFoldAndNext.lineTo(mViewWidth, mViewHeight);
+				mPathFoldAndNext.close();
 
-			// 短边偏移倍增
-			float mulOffsetShort = 1.0F;
-			for (int y = 0; y <= SUB_HEIGHT; y++) {
-				float fy = mViewHeight * y / SUB_HEIGHT;
-				for (int x = 0; x <= SUB_WIDTH; x++) {
-					float fx = mViewWidth * x / SUB_WIDTH;
+				// 计算月半圆区域
+				mRegionSemicircle = computeRegion(mPathSemicircleBtm);
+			} else {
+				/*
+				 * 计算参数
+				 */
+				float leftY = mViewHeight - sizeLong;
+				float btmX = mViewWidth - sizeShort;
 
-					/*
-					 * 右侧扭曲
-					 */
-					if (x == SUB_WIDTH) {
-						if (y >= mSubHeightStart && y <= mSubHeightEnd) {
-							fx = mViewWidth * x / SUB_WIDTH + offsetLong * mulOffsetLong;
-							mulOffsetLong = mulOffsetLong / 1.5F;
-						}
-					}
+				// 计算曲线起点
+				float startXBtm = btmX - CURVATURE * sizeShort;
+				float startYBtm = mViewHeight;
+				float startXLeft = mViewWidth;
+				float startYLeft = leftY - CURVATURE * sizeLong;
 
-					/*
-					 * 底部扭曲
-					 */
-					if (y == SUB_HEIGHT) {
-						if (x >= mSubWidthStart && x <= mSubWidthEnd) {
-							fy = mViewHeight * y / SUB_HEIGHT + offsetShort * mulOffsetShort;
-							mulOffsetShort = mulOffsetShort / 1.5F;
-						}
-					}
+				// 计算曲线终点
+				float endXBtm = mPointX + (1 - CURVATURE) * (tempAM);
+				float endYBtm = mPointY + (1 - CURVATURE) * mL;
+				float endXLeft = mPointX + (1 - CURVATURE) * mK;
+				float endYLeft = mPointY - (1 - CURVATURE) * (sizeLong - mL);
 
-					mVerts[index * 2 + 0] = fx;
-					mVerts[index * 2 + 1] = fy;
+				// 计算曲线控制点
+				float controlXBtm = btmX;
+				float controlYBtm = mViewHeight;
+				float controlXLeft = mViewWidth;
+				float controlYLeft = leftY;
 
-					index += 1;
+				// 计算曲线顶点
+				float bezierPeakXBtm = 0.25F * startXBtm + 0.5F * controlXBtm + 0.25F * endXBtm;
+				float bezierPeakYBtm = 0.25F * startYBtm + 0.5F * controlYBtm + 0.25F * endYBtm;
+				float bezierPeakXLeft = 0.25F * startXLeft + 0.5F * controlXLeft + 0.25F * endXLeft;
+				float bezierPeakYLeft = 0.25F * startYLeft + 0.5F * controlYLeft + 0.25F * endYLeft;
+
+				/*
+				 * 限制右侧曲线起点
+				 */
+				if (startYLeft <= 0) {
+					startYLeft = 0;
 				}
+
+				/*
+				 * 限制底部左侧曲线起点
+				 */
+				if (startXBtm <= 0) {
+					startXBtm = 0;
+				}
+
+				/*
+				 * 根据底部左侧限制点重新计算贝塞尔曲线顶点坐标
+				 */
+				float partOfShortLength = CURVATURE * sizeShort;
+				if (btmX >= -mValueAdded && btmX <= partOfShortLength - mValueAdded) {
+					float f = btmX / partOfShortLength;
+					float t = 0.5F * f;
+
+					float bezierPeakTemp = 1 - t;
+					float bezierPeakTemp1 = bezierPeakTemp * bezierPeakTemp;
+					float bezierPeakTemp2 = 2 * t * bezierPeakTemp;
+					float bezierPeakTemp3 = t * t;
+
+					bezierPeakXBtm = bezierPeakTemp1 * startXBtm + bezierPeakTemp2 * controlXBtm + bezierPeakTemp3 * endXBtm;
+					bezierPeakYBtm = bezierPeakTemp1 * startYBtm + bezierPeakTemp2 * controlYBtm + bezierPeakTemp3 * endYBtm;
+				}
+
+				/*
+				 * 根据右侧限制点重新计算贝塞尔曲线顶点坐标
+				 */
+				float partOfLongLength = CURVATURE * sizeLong;
+				if (leftY >= -mValueAdded && leftY <= partOfLongLength - mValueAdded) {
+					float f = leftY / partOfLongLength;
+					float t = 0.5F * f;
+
+					float bezierPeakTemp = 1 - t;
+					float bezierPeakTemp1 = bezierPeakTemp * bezierPeakTemp;
+					float bezierPeakTemp2 = 2 * t * bezierPeakTemp;
+					float bezierPeakTemp3 = t * t;
+
+					bezierPeakXLeft = bezierPeakTemp1 * startXLeft + bezierPeakTemp2 * controlXLeft + bezierPeakTemp3 * endXLeft;
+					bezierPeakYLeft = bezierPeakTemp1 * startYLeft + bezierPeakTemp2 * controlYLeft + bezierPeakTemp3 * endYLeft;
+				}
+
+				// 计算底部扭曲的起始细分下标
+				mSubWidthStart = Math.round((btmX / mSubMinWidth)) - 1;
+				mSubWidthEnd = Math.round(((btmX + CURVATURE * sizeShort) / mSubMinWidth)) + 1;
+
+				// 计算右侧扭曲的起始细分下标
+				mSubHeightStart = (int) (leftY / mSubMinHeight) - 1;
+				mSubHeightEnd = (int) (leftY + CURVATURE * sizeLong / mSubMinHeight) + 1;
+
+				/*
+				 * 生成折叠区域的扭曲坐标
+				 */
+				int index = 0;
+
+				// 长边偏移
+				float offsetLong = CURVATURE / 2F * sizeLong;
+
+				// 长边偏移倍增
+				float mulOffsetLong = 1.0F;
+
+				// 短边偏移
+				float offsetShort = CURVATURE / 2F * sizeShort;
+
+				// 短边偏移倍增
+				float mulOffsetShort = 1.0F;
+				for (int y = 0; y <= SUB_HEIGHT; y++) {
+					float fy = mViewHeight * y / SUB_HEIGHT;
+					for (int x = 0; x <= SUB_WIDTH; x++) {
+						float fx = mViewWidth * x / SUB_WIDTH;
+
+						/*
+						 * 右侧扭曲
+						 */
+						if (x == SUB_WIDTH) {
+							if (y >= mSubHeightStart && y <= mSubHeightEnd) {
+								fx = mViewWidth * x / SUB_WIDTH + offsetLong * mulOffsetLong;
+								mulOffsetLong = mulOffsetLong / 1.5F;
+							}
+						}
+
+						/*
+						 * 底部扭曲
+						 */
+						if (y == SUB_HEIGHT) {
+							if (x >= mSubWidthStart && x <= mSubWidthEnd) {
+								fy = mViewHeight * y / SUB_HEIGHT + offsetShort * mulOffsetShort;
+								mulOffsetShort = mulOffsetShort / 1.5F;
+							}
+						}
+
+						mVerts[index * 2 + 0] = fx;
+						mVerts[index * 2 + 1] = fy;
+
+						index += 1;
+					}
+				}
+
+				/*
+				 * 替补区域Path
+				 */
+				mPathTrap.moveTo(startXBtm, startYBtm);
+				mPathTrap.lineTo(startXLeft, startYLeft);
+				mPathTrap.lineTo(bezierPeakXLeft, bezierPeakYLeft);
+				mPathTrap.lineTo(bezierPeakXBtm, bezierPeakYBtm);
+				mPathTrap.close();
+
+				/*
+				 * 生成带曲线的三角形路径
+				 */
+				mPath.moveTo(startXBtm, startYBtm);
+				mPath.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPath.lineTo(mPointX, mPointY);
+				mPath.lineTo(endXLeft, endYLeft);
+				mPath.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
+
+				/*
+				 * 生成底部月半圆的Path
+				 */
+				mPathSemicircleBtm.moveTo(startXBtm, startYBtm);
+				mPathSemicircleBtm.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPathSemicircleBtm.close();
+
+				/*
+				 * 生成右侧月半圆的Path
+				 */
+				mPathSemicircleLeft.moveTo(endXLeft, endYLeft);
+				mPathSemicircleLeft.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
+				mPathSemicircleLeft.close();
+
+				/*
+				 * 生成包含折叠和下一页的路径
+				 */
+				mPathFoldAndNext.moveTo(startXBtm, startYBtm);
+				mPathFoldAndNext.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
+				mPathFoldAndNext.lineTo(mPointX, mPointY);
+				mPathFoldAndNext.lineTo(endXLeft, endYLeft);
+				mPathFoldAndNext.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
+				mPathFoldAndNext.lineTo(mViewWidth, mViewHeight);
+				mPathFoldAndNext.close();
+
+				/*
+				 * 计算底部和右侧两月半圆区域
+				 */
+				Region regionSemicircleBtm = computeRegion(mPathSemicircleBtm);
+				Region regionSemicircleLeft = computeRegion(mPathSemicircleLeft);
+
+				// 合并两月半圆区域
+				mRegionSemicircle.op(regionSemicircleBtm, regionSemicircleLeft, Region.Op.UNION);
 			}
 
-			/*
-			 * 替补区域Path
-			 */
-			mPathTrap.moveTo(startXBtm, startYBtm);
-			mPathTrap.lineTo(startXLeft, startYLeft);
-			mPathTrap.lineTo(bezierPeakXLeft, bezierPeakYLeft);
-			mPathTrap.lineTo(bezierPeakXBtm, bezierPeakYBtm);
-			mPathTrap.close();
+			// 根据Path生成的折叠区域
+			mRegionFold = computeRegion(mPath);
+
+			// 替补区域
+			Region regionTrap = computeRegion(mPathTrap);
+
+			// 令折叠区域与替补区域相加
+			mRegionFold.op(regionTrap, Region.Op.UNION);
+
+			// 从相加后的区域中剔除掉月半圆的区域获得最终折叠区域
+			mRegionFold.op(mRegionSemicircle, Region.Op.DIFFERENCE);
 
 			/*
-			 * 生成带曲线的三角形路径
+			 * 计算下一页区域
 			 */
-			mPath.moveTo(startXBtm, startYBtm);
-			mPath.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPath.lineTo(mPointX, mPointY);
-			mPath.lineTo(endXLeft, endYLeft);
-			mPath.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
+			mRegionNext = computeRegion(mPathFoldAndNext);
+			mRegionNext.op(mRegionFold, Region.Op.DIFFERENCE);
 
-			/*
-			 * 生成底部月半圆的Path
-			 */
-			mPathSemicircleBtm.moveTo(startXBtm, startYBtm);
-			mPathSemicircleBtm.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPathSemicircleBtm.close();
-
-			/*
-			 * 生成右侧月半圆的Path
-			 */
-			mPathSemicircleLeft.moveTo(endXLeft, endYLeft);
-			mPathSemicircleLeft.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
-			mPathSemicircleLeft.close();
-
-			/*
-			 * 生成包含折叠和下一页的路径
-			 */
-			mPathFoldAndNext.moveTo(startXBtm, startYBtm);
-			mPathFoldAndNext.quadTo(controlXBtm, controlYBtm, endXBtm, endYBtm);
-			mPathFoldAndNext.lineTo(mPointX, mPointY);
-			mPathFoldAndNext.lineTo(endXLeft, endYLeft);
-			mPathFoldAndNext.quadTo(controlXLeft, controlYLeft, startXLeft, startYLeft);
-			mPathFoldAndNext.lineTo(mViewWidth, mViewHeight);
-			mPathFoldAndNext.close();
-
-			/*
-			 * 计算底部和右侧两月半圆区域
-			 */
-			Region regionSemicircleBtm = computeRegion(mPathSemicircleBtm);
-			Region regionSemicircleLeft = computeRegion(mPathSemicircleLeft);
-
-			// 合并两月半圆区域
-			mRegionSemicircle.op(regionSemicircleBtm, regionSemicircleLeft, Region.Op.UNION);
 		}
-
-		// 根据Path生成的折叠区域
-		mRegionFold = computeRegion(mPath);
-
-		// 替补区域
-		Region regionTrap = computeRegion(mPathTrap);
-
-		// 令折叠区域与替补区域相加
-		mRegionFold.op(regionTrap, Region.Op.UNION);
-
-		// 从相加后的区域中剔除掉月半圆的区域获得最终折叠区域
-		mRegionFold.op(mRegionSemicircle, Region.Op.DIFFERENCE);
-
-		/*
-		 * 计算下一页区域
-		 */
-		mRegionNext = computeRegion(mPathFoldAndNext);
-		mRegionNext.op(mRegionFold, Region.Op.DIFFERENCE);
-
 		drawBitmaps(canvas);
+
 	}
 
 	/**
@@ -706,7 +780,7 @@ public class TwistView extends View {
 			mPointX += mAutoSlideV_BR;
 
 			// 并根据x坐标的值重新计算y坐标的值
-			mPointY = mStart_Y + ((mPointX - mStart_X) * (mViewHeight - mStart_Y)) / (mViewWidth - mStart_X);
+			mPointY = mStart_Y + ((mPointX - mStart_X) * (0 - mStart_Y)) / (mViewWidth - mStart_X);
 
 			// 让slideHandler处理重绘
 			mSlideHandler.sleep(50);
@@ -766,8 +840,8 @@ public class TwistView extends View {
 
 		switch (event.getAction() & MotionEvent.ACTION_MASK) {
 		case MotionEvent.ACTION_UP:// 手指抬起时候
-			Log.d("zcc", "oldX: " + oldX + " oldY；" + oldY + " currentX；" + x + " currentY: " + y);
-			Log.d("zcc", "oldX - x: " + (oldX - x));
+//			Log.d("zcc", "oldX: " + oldX + " oldY；" + oldY + " currentX；" + x + " currentY: " + y);
+//			Log.d("zcc", "oldX - x: " + (oldX - x));
 			if (isNextPage) {
 				/*
 				 * 如果当前时间点位于右下自滑区域
