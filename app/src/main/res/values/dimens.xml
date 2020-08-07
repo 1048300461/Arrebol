@@ -4,4 +4,6 @@
     <dimen name="cl_title_size">20sp</dimen>
     <dimen name="input_text_size">18sp</dimen>
     <dimen name="history_text_size">16sp</dimen>
+    <dimen name="novel_text_size">30sp</dimen>
+    <dimen name="novel_normal_text_size">25sp</dimen>
 </resources>

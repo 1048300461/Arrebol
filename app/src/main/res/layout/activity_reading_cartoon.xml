@@ -18,7 +18,7 @@
         android:id="@+id/cartoon_content_top_rl"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:background="@color/colorBlack"
+        android:background="@color/colorBlackAlpha"
         app:layout_constraintTop_toTopOf="parent"
         android:visibility="gone"
         android:animateLayoutChanges="true">
@@ -70,7 +70,7 @@
         android:id="@+id/cartoon_content_bottom_ll"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
-        android:background="@color/colorBlack"
+        android:background="@color/colorBlackAlpha"
         app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="horizontal"
         android:visibility="gone"

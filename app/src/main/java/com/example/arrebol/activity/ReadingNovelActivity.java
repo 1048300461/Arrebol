@@ -9,13 +9,13 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.arrebol.R;
 import com.example.arrebol.entity.Chapter;
 import com.example.arrebol.utils.HttpRequestUtils;
-import com.example.arrebol.widget.Reader.TwistView;
+import com.example.arrebol.widget.Reader1.PageTurnView;
+import com.example.arrebol.widget.Reader1.TwistView;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -38,6 +38,7 @@ public class ReadingNovelActivity extends AppCompatActivity {
     private Context context;
     private ArrayList<String> contents = new ArrayList<>();
     private TwistView twistView;
+    private PageTurnView pageTurnView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,7 +96,7 @@ public class ReadingNovelActivity extends AppCompatActivity {
      * 初始化视图
      */
     private void initView() {
-        twistView = findViewById(R.id.reading_page);
+        pageTurnView = findViewById(R.id.reading_page);
 
         Bitmap bitmap = null;
         List<Bitmap> bitmaps = new ArrayList<>();
@@ -111,7 +112,7 @@ public class ReadingNovelActivity extends AppCompatActivity {
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.page_img_e);
         bitmaps.add(bitmap);
 
-        twistView.setBitmaps(bitmaps);
+        pageTurnView.setBitmaps(bitmaps);
     }
 
     /**
