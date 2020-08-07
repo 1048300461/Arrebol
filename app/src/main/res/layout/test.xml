@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.arrebol.widget.Reader.TwistView
-        android:id="@+id/reading_page"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/novel_content_vp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </LinearLayout>

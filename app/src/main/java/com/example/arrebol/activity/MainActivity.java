@@ -22,6 +22,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     private ArrayList<Fragment> fragments = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
